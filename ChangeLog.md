@@ -9,8 +9,13 @@
 * Proxy support (#163)
 * Updated dependencies
 
-3.0.0:
+3.0.2-parse:
+* Fix 3.0.1-parse release
 
+3.0.1-parse:
+* Add support for apns-push-type key
+
+3.0.0:
 * Native Node.js HTTP/2 client
 * Requires Node.js 8.9.1 or later
 * Breaking changes:
