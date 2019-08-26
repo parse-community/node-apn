@@ -1,4 +1,8 @@
 ## Changelog
+3.0.5
+* Change Travis to use node 10 instead of node 9
+* Attempt changes to travis to get it to publish to npm
+
 3.0.4
 * No change, bumping version with travis enabled
 
