@@ -1,4 +1,7 @@
 ## Changelog
+3.0.4
+* No change, bumping version with travis enabled
+
 3.0.3
 * Create an npm installable package `@parse/node-apn`
 
