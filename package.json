@@ -1,7 +1,7 @@
 {
   "name": "@parse/node-apn",
   "description": "An interface to the Apple Push Notification service for Node.js",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "author": "Andrew Naylor <argon@mkbot.net>",
   "keywords": [
     "apple",
@@ -29,6 +29,9 @@
     "mocha": "^4.0.1",
     "sinon": "^1.12.2",
     "sinon-chai": "^2.14.0"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "test": "node_modules/.bin/mocha"

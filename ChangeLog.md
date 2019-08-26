@@ -1,4 +1,7 @@
 ## Changelog
+3.0.6
+* Set npm access to public in package.json to override default of private for scoped packages
+
 3.0.5
 * Change Travis to use node 10 instead of node 9
 * Attempt changes to travis to get it to publish to npm
