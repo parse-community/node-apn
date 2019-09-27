@@ -1,4 +1,9 @@
 ## Changelog
+3.1.0
+* Fix: http2session.shutdown() is not a function
+* Update npm install command in README
+* Add support for handling http2 GOAWAY messages and set http2 ping interval
+
 3.0.6
 * Set npm access to public in package.json to override default of private for scoped packages
 
