@@ -118,14 +118,14 @@ describe("Notification", function() {
 
 		context("priority is non-default", function() {
 			it("contains the apns-priority header", function() {
-				note.priority = 5;
+				note.payload.priority = 5;
 				expect(note.headers()).to.have.property("apns-priority", 5);
 			});
 		});
 
 		context("id is set", function() {
 			it("contains the apns-id header", function() {
-				note.id = "123e4567-e89b-12d3-a456-42665544000";
+				note.payload.id = "123e4567-e89b-12d3-a456-42665544000";
 
 				expect(note.headers()).to.have.property("apns-id", "123e4567-e89b-12d3-a456-42665544000");
 			});
@@ -133,7 +133,7 @@ describe("Notification", function() {
 
 		context("expiry is non-zero", function() {
 			it("contains the apns-expiration header", function() {
-				note.expiry = 1000;
+				note.payload.expiry = 1000;
 
 				expect(note.headers()).to.have.property("apns-expiration", 1000);
 			});
@@ -141,7 +141,7 @@ describe("Notification", function() {
 
 		context("topic is set", function() {
 			it("contains the apns-topic header", function() {
-				note.topic = "io.apn.node";
+				note.payload.topic = "io.apn.node";
 
 				expect(note.headers()).to.have.property("apns-topic", "io.apn.node");
 			});
@@ -149,7 +149,7 @@ describe("Notification", function() {
 
 		context("collapseId is set", function () {
 			it("contains the apns-collapse-id header", function () {
-				note.collapseId = "io.apn.collapse";
+				note.payload.collapseId = "io.apn.collapse";
 
 				expect(note.headers()).to.have.property("apns-collapse-id", "io.apn.collapse");
 			});
@@ -157,9 +157,9 @@ describe("Notification", function() {
 
 		context("pushType is set", function () {
 			it("contains the apns-push-type header", function () {
-				note.pushType = "alert";
+				note.payload.pushType = "background";
 
-				expect(note.headers()).to.have.property("apns-push-type", "alert");
+				expect(note.headers()).to.have.property("apns-push-type", "background");
 			});
 		});
 	});
