@@ -50,7 +50,7 @@ If you have previously used v1.x and wish to learn more about what's changed in 
 ### Load in the module
 
 ```javascript
-var apn = require('apn');
+var apn = require('@parse/node-apn');
 ```
 
 ### Connecting
