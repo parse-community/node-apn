@@ -110,6 +110,8 @@ export class Provider extends EventEmitter {
   shutdown(): void;
 }
 
+export type NotificationPushType = 'background' | 'alert';
+
 export interface NotificationAlertOptions {
   title?: string;
   subtitle?: string;
@@ -150,7 +152,7 @@ export class Notification {
   public priority: number;
 
   public collapseId: string;
-  public pushType: string;
+  public pushType: NotificationPushType;
   public threadId: string;
 
   /**
