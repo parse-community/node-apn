@@ -110,7 +110,7 @@ export class Provider extends EventEmitter {
   shutdown(): void;
 }
 
-export type NotificationPushType = 'background' | 'alert';
+export type NotificationPushType = 'background' | 'alert' | 'voip';
 
 export interface NotificationAlertOptions {
   title?: string;
