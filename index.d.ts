@@ -84,7 +84,7 @@ export interface ResponseSent {
 export interface ResponseFailure {
   device: string;
   error?: Error;
-  status?: string;
+  status?: number;
   response?: {
     reason: string;
     timestamp?: string;
