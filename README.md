@@ -13,19 +13,19 @@ node-apn
 [![devdependencies][devdependencies-image]][devdependencies-url]
 
 [logo]:doc/logo.png
-[npm-image]:https://nodei.co/npm/apn.png?downloads=true
-[npm-url]:https://npmjs.com/package/apn
-[ci-image]:https://api.travis-ci.org/node-apn/node-apn.svg
-[ci-url]:https://travis-ci.org/node-apn/node-apn
+[npm-image]:https://nodei.co/npm/@parse/node-apn.png?downloads=true
+[npm-url]:https://npmjs.com/package/@parse/node-apn
+[ci-image]:https://api.travis-ci.org/parse-community/node-apn.svg
+[ci-url]:https://travis-ci.org/parse-community/node-apn
 [coverage-image]:https://coveralls.io/repos/argon/node-apn/badge.svg?branch=develop
 [coverage-url]:https://coveralls.io/r/argon/node-apn
 [codacy-image]:https://www.codacy.com/project/badge/e7735fbe0db244f3b310657d0dabaa11
 [codacy-url]:https://www.codacy.com/public/argon/node-apn
 
-[dependencies-image]:https://david-dm.org/node-apn/node-apn/status.svg
-[dependencies-url]:https://david-dm.org/node-apn/node-apn
-[devdependencies-image]:https://david-dm.org/node-apn/node-apn/dev-status.svg
-[devdependencies-url]:https://david-dm.org/node-apn/node-apn?type=dev
+[dependencies-image]:https://david-dm.org/parse-community/node-apn/status.svg
+[dependencies-url]:https://david-dm.org/parse-community/node-apn
+[devdependencies-image]:https://david-dm.org/parse-community/node-apn/dev-status.svg
+[devdependencies-url]:https://david-dm.org/parse-community/node-apn?type=dev
 
 ## Features
 
@@ -132,7 +132,7 @@ This will result in the the following notification payload being sent to the dev
 {"messageFrom":"John Appelseed","aps":{"badge":3,"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message"}}
 ```
 
-You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`. 
+You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
 
 If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
 
@@ -177,7 +177,7 @@ Released under the MIT License
 > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 [npm]: https://npmjs.org
-[node-apn]: https://github.com/node-apn/node-apn
+[node-apn]: https://github.com/parse-community/node-apn
 [certificateWiki]:https://github.com/node-apn/node-apn/wiki/Preparing-Certificates "Preparing Certificates"
 [pl]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html "Local and Push Notification Programming Guide: APNs Overview"
 [tn2265]: http://developer.apple.com/library/ios/#technotes/tn2265/_index.html "Troubleshooting Push Notifications"
