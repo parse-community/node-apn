@@ -5,22 +5,14 @@ node-apn
 
 > A Node.js module for interfacing with the Apple Push Notification service.
 
-[![Maintenance help wanted](https://img.shields.io/badge/maintenance-help%20wanted-red.svg)](https://github.com/node-apn/node-apn/issues/436)
+![Maintenance help wanted](https://img.shields.io/badge/maintenance-help%20wanted-red.svg)
 [![Build status][ci-image] ][ci-url]
-[![Codacy][codacy-image]][codacy-url]
-![dependencies][dependencies-image]
-![devdependencies][devdependencies-image]
 
 [logo]:doc/logo.png
 [npm-image]:https://nodei.co/npm/@parse/node-apn.png?downloads=true
 [npm-url]:https://npmjs.com/package/@parse/node-apn
 [ci-image]:https://api.travis-ci.org/parse-community/node-apn.svg
 [ci-url]:https://travis-ci.org/parse-community/node-apn
-[codacy-image]:https://www.codacy.com/project/badge/e7735fbe0db244f3b310657d0dabaa11
-[codacy-url]:https://www.codacy.com/public/argon/node-apn
-
-[dependencies-image]:https://img.shields.io/david/parse-community/node-apn
-[devdependencies-image]:https://img.shields.io/david/dev/parse-community/node-apn
 
 ## Features
 
