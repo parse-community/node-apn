@@ -18,17 +18,17 @@
     "url": "https://github.com/parse-community/node-apn.git"
   },
   "dependencies": {
-    "debug": "^3.1.0",
-    "jsonwebtoken": "^8.1.0",
-    "node-forge": "^0.7.1",
-    "verror": "^1.10.0"
+    "debug": "3.1.0",
+    "jsonwebtoken": "8.1.0",
+    "node-forge": "0.10.0",
+    "verror": "1.10.0"
   },
   "devDependencies": {
     "chai": "3.x",
-    "chai-as-promised": "^7.1.1",
-    "mocha": "^4.0.1",
-    "sinon": "^1.12.2",
-    "sinon-chai": "^2.14.0"
+    "chai-as-promised": "7.1.1",
+    "mocha": "4.0.1",
+    "sinon": "1.17.7",
+    "sinon-chai": "2.14.0"
   },
   "publishConfig": {
     "access": "public"
