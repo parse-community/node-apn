@@ -1,4 +1,9 @@
 ## Changelog
+3.2.0
+* Update node-forge and pin packages
+* Add typings for the "voip" NotificationPushType
+* Typed Notification.pushType
+
 3.1.0
 * Fix: http2session.shutdown() is not a function
 * Update npm install command in README
