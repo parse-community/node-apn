@@ -48,7 +48,7 @@
 2.1.3:
 * Add thread-id to notification payload (#484)
 * Workaround an issue where APNS would return an HTTP 500 and make the connection unusable (#449, #480)
-* Regularily renew JSON web token (#449, #480)
+* Regularly renew JSON web token (#449, #480)
 
 2.1.2:
 * Add TypeScript type definitions (#441, #465)

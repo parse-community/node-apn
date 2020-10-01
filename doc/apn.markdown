@@ -54,7 +54,7 @@ The `send` method returns a [`Promise`][promise] which will be fulfilled when al
 
 ```javascript
 provider.send(notification, deviceTokens).then( (response) => {
-		// response.sent: Array of device tokens to which the notification was sent succesfully
+		// response.sent: Array of device tokens to which the notification was sent successfully
 		// response.failed: Array of objects containing the device token (`device`) and either an `error`, or a `status` and `response` from the API
 });
 ```
