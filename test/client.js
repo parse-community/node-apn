@@ -125,6 +125,7 @@ describe("Client", () => {
   it("Treats HTTP 200 responses as successful", async () => {
     let didRequest = false;
     let establishedConnections = 0;
+    let requestsServed = 0;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
         ':authority': '127.0.0.1',
@@ -138,6 +139,7 @@ describe("Client", () => {
       // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
       res.writeHead(200);
       res.end('');
+      requestsServed += 1;
       didRequest = true;
     });
     server.on('connection', () => establishedConnections += 1);
@@ -158,11 +160,21 @@ describe("Client", () => {
       );
       expect(result).to.deep.equal({ device: MOCK_DEVICE_TOKEN });
       expect(didRequest).to.be.true;
-      didRequest = false;
     };
-    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
     await runSuccessfulRequest();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
   });
 
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
