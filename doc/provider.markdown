@@ -25,6 +25,8 @@ Options:
 
  - `connectionRetryLimit` {Number} The maximum number of connection failures that will be tolerated before `apn.Provider` will "give up". [See below.](#connection-retry-limit) (Defaults to: 3)
 
+ - `timeout` {Number} The timeout in milliseconds for a given HTTP/2 request before the `apn.Client` will assume the server is dead and forcefully reconnect. (Defaults to: 10000)
+
 #### Provider Certificates vs. Authentication Tokens
 
 Apple have introduced a new means of authentication with the APNs - [Provider Authentication Tokens][provider-auth-tokens]. These replace the old-style Certificate/Key pairs with tokens based on the [JWT][jwt] standard. The new system is superior in a number of ways:
