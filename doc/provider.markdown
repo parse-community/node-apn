@@ -57,7 +57,7 @@ Calling `send` will return a `Promise`. The Promise will resolve after each noti
   - `failed` (rejected) - the notification was rejected by Apple. A rejection has an associated `status` and `reason` which is included.
   - `failed` (error) - a connection-level error occurred which prevented successful communication with Apple. In very rare cases it's possible that the notification was still delivered. However, this state usually results from a network problem.
 
-When the returned `Promise` resolves its' value will be an Object containing two properties
+When the returned `Promise` resolves, its value will be an Object containing two properties
 
 #### sent
 
