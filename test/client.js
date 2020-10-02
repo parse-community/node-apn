@@ -10,7 +10,7 @@ const credentials = require("../lib/credentials")({
 });
 
 const TEST_PORT = 30939;
-
+const LOAD_TEST_BATCH_SIZE = 2000;
 
 const config = require("../lib/config")({
   logger: debug,
@@ -175,6 +175,58 @@ describe("Client", () => {
     await runSuccessfulRequest();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
+  });
+
+  // Assert that this doesn't crash when a large batch of requests are requested simultaneously
+  it("Treats HTTP 200 responses as successful (load test for a batch of requests)", async function () {
+    this.timeout(10000);
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': 'POST',
+        ':path': `/3/device/${MOCK_DEVICE_TOKEN}`,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // Set a timeout of 100 to simulate latency to a remote server.
+      setTimeout(() => {
+        res.writeHead(200);
+        res.end('');
+        requestsServed += 1;
+      }, 100);
+    });
+    server.on('connection', () => establishedConnections += 1);
+    await new Promise((resolve) => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT, 1500);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = {'apns-someheader': 'somevalue'};
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const mockDevice = MOCK_DEVICE_TOKEN;
+      const result = await client.write(
+        mockNotification,
+        mockDevice,
+      );
+      expect(result).to.deep.equal({ device: MOCK_DEVICE_TOKEN });
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    const promises = [];
+    for (let i = 0; i < LOAD_TEST_BATCH_SIZE; i++) {
+      promises.push(runSuccessfulRequest());
+    }
+
+    await Promise.all(promises);
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(LOAD_TEST_BATCH_SIZE);
   });
 
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
