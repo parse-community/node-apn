@@ -25,7 +25,7 @@ Options:
 
  - `connectionRetryLimit` {Number} The maximum number of connection failures that will be tolerated before `apn.Provider` will "give up". [See below.](#connection-retry-limit) (Defaults to: 3)
 
- - `timeout` {Number} The timeout in milliseconds for a given HTTP/2 request before the `apn.Client` will assume the server is dead and forcefully reconnect. (Defaults to: 10000)
+ - `timeout` {Number} The timeout in milliseconds for a given HTTP/2 connection. If a request is sent out and no successful response has been received for *any* request within this timeout, the `apn.Client` will assume the connection to the server is dead and forcefully reconnect. (Defaults to: 10000)
 
 #### Provider Certificates vs. Authentication Tokens
 
