@@ -102,7 +102,7 @@ If you wish to send notifications containing emoji or other multi-byte character
 
 Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
 
-**Note:** If notifications are pushed after the connection has completely shutdown a new connection will be established. However, the shutdown flag will remain and after the notifications are sent the connections will be optimistically shutdown again. Do not rely on this behaviour, it's more of a quirk.
+**Note:** If notifications are pushed after the connection has started, an error will be thrown.
 
 [provider-api]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html
 [provider-auth-tokens]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1

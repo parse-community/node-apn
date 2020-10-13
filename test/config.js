@@ -31,6 +31,7 @@ describe("config", function () {
       rejectUnauthorized: true,
       connectionRetryLimit: 10,
       heartBeat: 60000,
+      requestTimeout: 5000,
     });
   });
 
