@@ -1,4 +1,17 @@
 ## Changelog
+
+4.0.0
+* BREAKING: shutdown() function on client now destroy the client and future requests throw error
+* Add test cases to Client
+* Improve verbose messages
+* Add request timeout handler
+* Add a new config setting requestTimeout (defaults to 5000 milliseconds)
+* Change ResponseFailure.status typing to be number
+* Fix nits on typos in documentation
+* Also run tests in Node 12 and 14
+* Remove the unreferenced lib/protocol directory
+* Improve GO AWAY handler
+
 3.2.0
 * Update node-forge and pin packages
 * Add typings for the "voip" NotificationPushType

@@ -54,6 +54,10 @@ export interface ProviderOptions {
    * The maximum number of connection failures that will be tolerated before `apn` will "terminate". (Defaults to: 3)
    */
   connectionRetryLimit?: number;
+  /**
+   * The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
+   */
+  requestTimeout?: number;
 }
 
 interface ApsAlert {
