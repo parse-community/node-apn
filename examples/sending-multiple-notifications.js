@@ -19,8 +19,7 @@ let service = new apn.Provider({
   key: "certificates/key.pem",
 });
 
-users.forEach( (user) => {
-
+Promise.all(users.map(user => {
   let note = new apn.Notification();
   note.alert = `Hey ${user.name}, I just sent my first Push Notification`;
 
@@ -29,14 +28,14 @@ users.forEach( (user) => {
 
   console.log(`Sending: ${note.compile()} to ${user.devices}`);
 
-  service.send(note, user.devices).then( result => {
+  return service.send(note, user.devices).then( result => {
       console.log("sent:", result.sent.length);
       console.log("failed:", result.failed.length);
       console.log(result.failed);
   });
+})).then(() => {
+  // For one-shot notification tasks you may wish to shutdown the connection
+  // after everything is sent, but only call shutdown if you need your
+  // application to terminate.
+  service.shutdown();
 });
-
-// For one-shot notification tasks you may wish to shutdown the connection
-// after everything is sent, but only call shutdown if you need your
-// application to terminate.
-service.shutdown();
