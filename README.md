@@ -5,8 +5,9 @@ node-apn
 
 > A Node.js module for interfacing with the Apple Push Notification service.
 
-![Maintenance help wanted](https://img.shields.io/badge/maintenance-help%20wanted-red.svg)
-[![Build status][ci-image] ][ci-url]
+<a href="https://github.com/parse-community/node-apn/actions?query=workflow%3Aci+branch%3Amaster">
+  <img alt="Build status" src="https://github.com/parse-community/node-apn/workflows/ci/badge.svg?branch=master">
+</a>
 
 [logo]:doc/logo.png
 [npm-image]:https://nodei.co/npm/@parse/node-apn.png?downloads=true
