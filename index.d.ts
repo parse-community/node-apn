@@ -71,11 +71,17 @@ interface ApsAlert {
   "action-loc-key"?: string
 }
 
+interface ApsSound {
+  critical: number; // 1
+  name: string;
+  volume: number;
+}
+
 interface Aps {
   alert?: string | ApsAlert
   "launch-image"?: string
   badge?: number
-  sound?: string
+  sound?: string | ApsSound;
   "content-available"?: undefined | 1
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
@@ -177,7 +183,7 @@ export class Notification {
   /**
    * The value to specify for `payload.aps.sound`
    */
-  public sound: string;
+  public sound: string | ApsSound;
   /**
    * The value to specify for `payload.aps.alert` can be either a `String` or an `Object` as outlined by the payload documentation.
    */

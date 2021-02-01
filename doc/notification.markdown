@@ -99,7 +99,7 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `actionLocKey`      | `aps.alert.action-loc-key`  | `String`            |
 | `launchImage`       | `aps.launch-image`          | `String`            |
 | `badge`             | `aps.badge`                 | `Number`            |
-| `sound`             | `aps.sound`                 | `String`            |
+| `sound`             | `aps.sound`                 | `String` or `Object`|
 | `contentAvailable`  | `aps.content-available`     | `1`                 |
 | `mutableContent`    | `aps.mutable-content`       | `1`                 |
 | `urlArgs`           | `aps.url-args`              | `Array`             |
