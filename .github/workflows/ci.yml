@@ -34,5 +34,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ matrix.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
               ${{ runner.os }}-node-${{ matrix.NODE_VERSION }}-
+      - run: npm ci
       - run: npm run coverage
       - run: bash <(curl -s https://codecov.io/bash)
