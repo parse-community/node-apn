@@ -76,7 +76,7 @@ For **rejected** notifications the object will take the following form
 ```javascript
 {
   device: "834c8b48e6254e47435d74720b1d4a13e3e57d0bf318333c284c1db8ce8ddc58",
-  status: "410",
+  status: 410,
   response: {
     reason: "Unregistered"
   }
