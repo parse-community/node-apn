@@ -36,8 +36,8 @@
     "access": "public"
   },
   "scripts": {
-    "coverage": "nyc node_modules/.bin/mocha",
-    "test": "node_modules/.bin/mocha"
+    "coverage": "nyc mocha",
+    "test": "mocha"
   },
   "jshintConfig": {
     "node": true
