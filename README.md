@@ -8,6 +8,7 @@ node-apn
 <a href="https://github.com/parse-community/node-apn/actions?query=workflow%3Aci+branch%3Amaster">
   <img alt="Build status" src="https://github.com/parse-community/node-apn/workflows/ci/badge.svg?branch=master">
 </a>
+ <a href="http://codecov.io/github/parse-community/node-apn?branch=master"><img alt="Test coverage" src="http://codecov.io/github/parse-community/node-apn/coverage.svg?branch=master"></a>
 
 [logo]:doc/logo.png
 [npm-image]:https://nodei.co/npm/@parse/node-apn.png?downloads=true
