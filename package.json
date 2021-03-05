@@ -36,7 +36,7 @@
     "access": "public"
   },
   "scripts": {
-    "coverage": "node_modules/.bin/nyc node_modules/.bin/mocha",
+    "coverage": "node_modules/.bin/nyc --reporter=lcov node_modules/.bin/mocha",
     "test": "node_modules/.bin/mocha"
   },
   "jshintConfig": {
