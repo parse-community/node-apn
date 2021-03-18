@@ -131,11 +131,27 @@ describe("Notification", function() {
 			});
 		});
 
-		context("expiry is non-zero", function() {
+		context("expiry is greater than zero", function() {
 			it("contains the apns-expiration header", function() {
 				note.expiry = 1000;
 
 				expect(note.headers()).to.have.property("apns-expiration", 1000);
+			});
+		});
+
+        context("expiry is zero", function() {
+			it("contains the apns-expiration header", function() {
+				note.expiry = 0;
+
+				expect(note.headers()).to.have.property("apns-expiration", 0);
+			});
+		});
+
+        context("expiry is negative", function() {
+			it("not contains the apns-expiration header", function() {
+				note.expiry = -1;
+
+				expect(note.headers()).to.not.have.property("apns-expiration");
 			});
 		});
 
