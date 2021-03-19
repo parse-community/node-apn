@@ -25,7 +25,7 @@ describe("config", function () {
       pfx: null,
       passphrase: null,
       production: false,
-      address: "api.development.push.apple.com",
+      address: "api.sandbox.push.apple.com",
       port: 443,
       proxy: null,
       rejectUnauthorized: true,
@@ -51,7 +51,7 @@ describe("config", function () {
     });
 
     it("should use api.sandbox.push.apple.com as the default connection address", function () {
-      expect(config()).to.have.property("address", "api.development.push.apple.com");
+      expect(config()).to.have.property("address", "api.sandbox.push.apple.com");
     });
 
     it("should use api.push.apple.com when NODE_ENV=production", function () {
@@ -61,7 +61,7 @@ describe("config", function () {
 
     it("should give precedence to production flag over NODE_ENV=production", function () {
       process.env.NODE_ENV = "production";
-      expect(config({ production: false })).to.have.property("address", "api.development.push.apple.com");
+      expect(config({ production: false })).to.have.property("address", "api.sandbox.push.apple.com");
     });
 
     it("should use api.push.apple.com when production:true", function () {
