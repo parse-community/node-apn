@@ -1,6 +1,7 @@
 "use strict";
 
 const VError = require("verror");
+const net = require("net");
 const http2 = require("http2");
 const util = require("util");
 
@@ -505,6 +506,79 @@ describe("Client", () => {
     ]);
     expect(establishedConnections).to.equal(3);
   });
+
+  it("Establishes a connection through a proxy server", async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': 'POST',
+        ':path': `/3/device/${MOCK_DEVICE_TOKEN}`,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => establishedConnections += 1);
+    await new Promise((resolve) => server.once('listening', resolve));
+
+    // Proxy forwards all connections to TEST_PORT
+    const proxy = net.createServer((clientSocket) => {
+      clientSocket.once('data', () => {
+        const serverSocket = net.createConnection(TEST_PORT, () => {
+          clientSocket.write('HTTP/1.1 200 OK\r\n\r\n');
+          clientSocket.pipe(serverSocket);
+          setTimeout(() => {
+            serverSocket.pipe(clientSocket);
+          }, 1);
+        });
+      });
+    });
+    await new Promise((resolve) => proxy.listen(3128, resolve));
+    
+    // Client configured with a port that the server is not listening on
+    client = createClient(TEST_PORT + 1);
+    // So without adding a proxy config request will fail with a network error
+    client.config.proxy = { host: "127.0.0.1", port: 3128 }
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = {'apns-someheader': 'somevalue'};
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const mockDevice = MOCK_DEVICE_TOKEN;
+      const result = await client.write(
+        mockNotification,
+        mockDevice,
+      );
+      expect(result).to.deep.equal({ device: MOCK_DEVICE_TOKEN });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
+
+    proxy.close();
+  })
 
   // let fakes, Client;
 
