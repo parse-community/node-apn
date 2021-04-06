@@ -245,6 +245,13 @@ describe("Client", () => {
     await new Promise((resolve) => server.on('listening', resolve));
 
     client = createClient(TEST_PORT);
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = (message) => { infoMessages.push(message); };
+    const mockErrorLogger = (message) => { errorMessages.push(message); };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const runRequestWithBadDeviceToken = async () => {
       const mockHeaders = {'apns-someheader': 'somevalue'};
@@ -270,6 +277,12 @@ describe("Client", () => {
     await runRequestWithBadDeviceToken();
     await runRequestWithBadDeviceToken();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(infoMessages).to.deep.equal([
+      'Session connected',
+      "Request ended with status 400 and responseData: {\"reason\": \"BadDeviceToken\"}",
+      "Request ended with status 400 and responseData: {\"reason\": \"BadDeviceToken\"}",
+    ]);
+    expect(errorMessages).to.deep.equal([]);
   });
 
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
@@ -304,7 +317,7 @@ describe("Client", () => {
       expect(result).to.exist;
       expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
       expect(result.error).to.be.an.instanceof(VError);
-      expect(result.error.message).to.have.string('stream ended unexpectedly');      
+      expect(result.error.message).to.have.string('stream ended unexpectedly');
     };
     await runRequestWithInternalServerError();
     await runRequestWithInternalServerError();
@@ -432,7 +445,7 @@ describe("Client", () => {
       );
       expect(result).to.deep.equal({
         device: MOCK_DEVICE_TOKEN,
-        error: new VError('stream ended unexpectedly'),
+        error: new VError('stream ended unexpectedly with status null and empty body'),
       });
       expect(didGetRequest).to.be.true;
       didGetRequest = false;
@@ -474,7 +487,7 @@ describe("Client", () => {
       );
       expect(result).to.deep.equal({
         device: MOCK_DEVICE_TOKEN,
-        error: new VError('stream ended unexpectedly'),
+        error: new VError('stream ended unexpectedly with status null and empty body'),
       });
       expect(didGetRequest).to.be.true;
     };

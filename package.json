@@ -24,6 +24,7 @@
     "verror": "1.10.0"
   },
   "devDependencies": {
+    "@types/node": "^14.14.37",
     "chai": "3.x",
     "chai-as-promised": "7.1.1",
     "codecov": "3.8.1",

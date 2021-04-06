@@ -108,6 +108,16 @@ export class Provider extends EventEmitter {
    * A "recipient" is a String containing the hex-encoded device token.
    */
   send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+
+  /**
+   * Set an info logger, and optionally an errorLogger to separately log errors.
+   *
+   * In order to log, these functions must have a property '.enabled' that is true.
+   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * based on the DEBUG environment variable)
+   */
+  setLogger(logger: (string) => void, errorLogger?: (string) => void): Promise<Responses>;
+
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
