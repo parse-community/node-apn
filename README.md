@@ -87,6 +87,29 @@ var apnProvider = new apn.Provider(options);
 
 The provider will first send an HTTP CONNECT request to the specified proxy in order to establish an HTTP tunnel. Once established, it will create a new secure connection to the Apple Push Notification provider API through the tunnel.
 
+#### Using a pool of http/2 connections
+
+Because http/2 already uses multiplexing, you probably don't need to use more than one client unless you are hitting http/2 concurrent request limits.
+
+```javascript
+var options = {
+  // Round robin pool with 2 clients. More can be used if needed.
+  clientCount: 2,
+  token: {
+    key: "path/to/APNsAuthKey_XXXXXXXXXX.p8",
+    keyId: "key-id",
+    teamId: "developer-team-id"
+  },
+  proxy: {
+    host: "192.168.10.92",
+    port: 8080
+  },
+  production: false
+};
+
+var apnProvider = new apn.MultiProvider(options);
+```
+
 ### Sending a notification
 To send a notification you will first need a device token from your app as a string
 

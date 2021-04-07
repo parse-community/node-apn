@@ -1,4 +1,7 @@
 ## Changelog
+5.0.0
+* Drop support for node versions prior to 12 - those node versions have bugs in the http2 library.
+* Support MultiProvider and MultiClient to use a round-robin client for HTTP2.
 
 4.1.1
 * FIX: add proxy and fix logger types

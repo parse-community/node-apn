@@ -64,6 +64,13 @@ export interface ProviderOptions {
   proxy?: { host: string, port: number|string }
 }
 
+export interface MultiProviderOptions extends ProviderOptions {
+  /**
+   * The number of clients in this round robin pool. Defaults to 2.
+   */
+  clientCount?: number
+}
+
 interface ApsAlert {
   body?: string
   "loc-key"?: string
@@ -131,7 +138,31 @@ export class Provider extends EventEmitter {
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
-  shutdown(): void;
+  shutdown(callback?: () => void): void;
+}
+
+export class MultiProvider extends EventEmitter {
+  constructor(options: MultiProviderOptions);
+  /**
+   * This is main interface for sending notifications. Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+   *
+   * A "recipient" is a String containing the hex-encoded device token.
+   */
+  send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+
+  /**
+   * Set an info logger, and optionally an errorLogger to separately log errors.
+   *
+   * In order to log, these functions must have a property '.enabled' that is true.
+   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * based on the DEBUG environment variable)
+   */
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
+
+  /**
+   * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
+   */
+  shutdown(callback?: () => void): void;
 }
 
 export type NotificationPushType = 'background' | 'alert' | 'voip';

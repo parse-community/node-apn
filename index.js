@@ -20,9 +20,18 @@ const Client = require("./lib/client")({
   http2,
 });
 
+const MultiClient = require("./lib/multiclient")({
+  Client,
+});
+
 const Provider = require("./lib/provider")({
   logger: debug,
   Client,
+});
+
+const MultiProvider = require("./lib/provider")({
+  logger: debug,
+  Client: MultiClient,
 });
 
 const Notification = require("./lib/notification");
@@ -31,6 +40,7 @@ const token = require("./lib/token");
 
 module.exports = {
   Provider,
+  MultiProvider,
   Notification,
   token,
 };

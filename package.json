@@ -1,7 +1,7 @@
 {
   "name": "@parse/node-apn",
   "description": "An interface to the Apple Push Notification service for Node.js",
-  "version": "4.1.1",
+  "version": "5.0.0",
   "author": "Andrew Naylor <argon@mkbot.net>",
   "keywords": [
     "apple",
@@ -24,14 +24,14 @@
     "verror": "1.10.0"
   },
   "devDependencies": {
-    "@types/node": "^14.14.37",
-    "chai": "3.x",
+    "@types/node": "^14.14.40",
+    "chai": "^4.3.4",
     "chai-as-promised": "7.1.1",
     "codecov": "3.8.1",
-    "mocha": "4.0.1",
+    "mocha": "^8.3.2",
     "nyc": "15.1.0",
-    "sinon": "1.17.7",
-    "sinon-chai": "2.14.0"
+    "sinon": "^10.0.0",
+    "sinon-chai": "^3.6.0"
   },
   "publishConfig": {
     "access": "public"
@@ -51,7 +51,7 @@
     }
   },
   "engines": {
-    "node": ">= 8.9.1"
+    "node": ">= 12"
   },
   "license": "MIT"
 }

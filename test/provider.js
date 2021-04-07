@@ -125,7 +125,7 @@ describe("Provider", function() {
           const provider = new Provider( { address: "testapi" } );
 
           for(let i=0; i < fakes.resolutions.length; i++) {
-            fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i])); 
+            fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
           }
 
           promise = provider.send(notificationDouble(), fakes.resolutions.map( res => res.device ));
@@ -141,12 +141,14 @@ describe("Provider", function() {
 
         it("resolves with the device token, status code and response or error of the unsent notifications", function () {
           return promise.then( (response) => {
+            expect(response.failed[3].error).to.be.an.instanceof(Error);
+            response.failed[3].error = { message: response.failed[3].error.message };
             expect(response.failed).to.deep.equal([
               { device: "adfe5969", status: "400", response: { reason: "MissingTopic" }},
               { device: "abcd1335", status: "410", response: { reason: "BadDeviceToken", timestamp: 123456789 }},
               { device: "aabbc788", status: "413", response: { reason: "PayloadTooLarge" }},
-              { device: "fbcde238", error: new Error("connection failed") },
-            ]);
+              { device: "fbcde238", error: { message: "connection failed" }},
+            ], `Unexpected result: ${JSON.stringify(response.failed)}`);
           });
         });
       });
@@ -154,7 +156,7 @@ describe("Provider", function() {
   });
 
   describe("shutdown", function () {
-    it("invokes shutdown on the client", function () { 
+    it("invokes shutdown on the client", function () {
       let provider = new Provider({});
       provider.shutdown();
 
