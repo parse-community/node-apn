@@ -71,11 +71,17 @@ interface ApsAlert {
   "action-loc-key"?: string
 }
 
+interface ApsSound {
+  critical: number; // 1
+  name: string;
+  volume: number;
+}
+
 interface Aps {
   alert?: string | ApsAlert
   "launch-image"?: string
   badge?: number
-  sound?: string
+  sound?: string | ApsSound
   "content-available"?: undefined | 1
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
@@ -113,7 +119,7 @@ export class Provider extends EventEmitter {
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
    * In order to log, these functions must have a property '.enabled' that is true.
-   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
   setLogger(logger: (string) => void, errorLogger?: (string) => void): Promise<Responses>;
@@ -187,7 +193,7 @@ export class Notification {
   /**
    * The value to specify for `payload.aps.sound`
    */
-  public sound: string;
+  public sound: string | ApsSound;
   /**
    * The value to specify for `payload.aps.alert` can be either a `String` or an `Object` as outlined by the payload documentation.
    */

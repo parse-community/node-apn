@@ -516,8 +516,20 @@ describe("Notification", function() {
         expect(compiledOutput()).to.not.have.deep.property("aps.sound");
       });
 
-      describe("setSound", function () {
-        it("is chainable", function () {
+      it("can be set to object", function() {
+        note.sound = {
+          name: "sound.caf",
+          critical: 1,
+          volume: 0.75
+        };
+
+        expect(compiledOutput()).to.have.deep.property("aps.sound.name", "sound.caf");
+        expect(compiledOutput()).to.have.deep.property("aps.sound.critical", 1);
+        expect(compiledOutput()).to.have.deep.property("aps.sound.volume", 0.75);
+      });
+
+      describe("setSound", function() {
+        it("is chainable", function() {
           expect(note.setSound("bee.caf")).to.equal(note);
           expect(compiledOutput()).to.have.deep.property("aps.sound", "bee.caf");
         });
