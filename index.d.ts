@@ -58,6 +58,10 @@ export interface ProviderOptions {
    * The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
    */
   requestTimeout?: number;
+  /**
+   * Connect through an HTTP proxy
+   */
+  proxy?: { host: string, port: number|string }
 }
 
 interface ApsAlert {
@@ -116,7 +120,7 @@ export class Provider extends EventEmitter {
    * (The default logger uses the npm 'debug' module which sets '.enabled' 
    * based on the DEBUG environment variable)
    */
-  setLogger(logger: (string) => void, errorLogger?: (string) => void): Promise<Responses>;
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
 
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
