@@ -130,6 +130,16 @@ describe("MultiClient", () => {
     }
   });
 
+  it("rejects invalid clientCount", () => {
+    [-1, 'invalid'].forEach((clientCount) => {
+      expect(() => new MultiClient({
+        port: TEST_PORT,
+        address: '127.0.0.1',
+        clientCount,
+      })).to.throw(`Expected positive client count but got ${clientCount}`);
+    });
+  });
+
   it("Treats HTTP 200 responses as successful", async () => {
     let didRequest = false;
     let establishedConnections = 0;
