@@ -685,6 +685,35 @@ describe("Notification", function() {
       });
     });
 
+    describe("target-content-id", function() {
+      it("defaults to undefined", function() {
+        expect(compiledOutput())
+          .to.not.have.nested.property("aps.target\-content\-id");
+      });
+
+      it("can be set to a string", function() {
+        note.targetContentIdentifier = "the-target-content-id";
+
+        expect(compiledOutput()).to.have.nested.property("aps.target\-content\-id",
+          "the-target-content-id");
+      });
+
+      it("can be set to undefined", function() {
+        note.targetContentIdentifier = "the-target-content-identifier";
+        note.targetContentIdentifier = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property("aps.target\-content\-id");
+      });
+
+      describe("setTargetContentIdentifier", function () {
+        it("is chainable", function () {
+          expect(note.setTargetContentIdentifier("the-target-content-id")).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property("aps.target\-content\-id",
+            "the-target-content-id");
+        });
+      });
+    });
+
     describe("thread-id", function() {
       it("defaults to undefined", function() {
         expect(compiledOutput()).to.not.have.deep.property("aps.thread\-id");
