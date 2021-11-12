@@ -600,6 +600,58 @@ describe("Notification", function() {
       });
     });
 
+    describe("interruption-level", function() {
+      it("defaults to undefined", function() {
+        expect(compiledOutput()).to.not.have.deep.property("aps.interruption\-level");
+      });
+
+      it("can be set to a string value", function() {
+        note.interruptionLevel = "time-sensitive";
+
+        expect(compiledOutput()).to.have.deep.property("aps.interruption\-level", "time-sensitive");
+      });
+
+      it("can be set to undefined", function() {
+        note.interruptionLevel = "passive";
+        note.interruptionLevel = undefined;
+
+        expect(compiledOutput()).to.not.have.deep.property("aps.interruption\-level");
+      });
+
+      describe("setInterruptionLevel", function () {
+        it("is chainable", function () {
+          expect(note.setInterruptionLevel("active")).to.equal(note);
+          expect(compiledOutput()).to.have.deep.property("aps.interruption\-level", "active");
+        });
+      });
+    });
+
+    describe("target-content-id", function() {
+      it("defaults to undefined", function() {
+        expect(compiledOutput()).to.not.have.deep.property("aps.target\-content\-id");
+      });
+
+      it("can be set to a string value", function() {
+        note.interruptionLevel = "window1";
+
+        expect(compiledOutput()).to.have.deep.property("aps.target\-content\-id", "window1");
+      });
+
+      it("can be set to undefined", function() {
+        note.interruptionLevel = "window1";
+        note.interruptionLevel = undefined;
+
+        expect(compiledOutput()).to.not.have.deep.property("aps.target\-content\-id");
+      });
+
+      describe("setTargetContentIdentifier", function () {
+        it("is chainable", function () {
+          expect(note.setTargetContentIdentifier("example")).to.equal(note);
+          expect(compiledOutput()).to.have.deep.property("aps.target\-content\-id", "example");
+        });
+      });
+    });
+
     describe("mdm", function() {
       it("defaults to undefined", function() {
         expect(compiledOutput()).to.not.have.deep.property("mdm");

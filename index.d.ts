@@ -238,9 +238,17 @@ export class Notification {
    */
   public contentAvailable: boolean;
   /**
-   *
+   * Setting this to 1 will specify "mutable-content" in the payload when it is compiled.
    */
   public mutableContent: boolean;
+  /**
+   * Specify interruption-level of a notification.
+   */
+  public interruptionLevel: string;
+  /**
+   * Specify target-content-id of a notification.
+   */
+  public targetContentIdentifier: string;
   /**
    * The value to specify for the `mdm` field where applicable.
    */

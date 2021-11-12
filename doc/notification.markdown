@@ -11,6 +11,7 @@ let notification = new apn.Notification({
   alert: "Hello, world!",
   sound: "chime.caf",
   mutableContent: 1,
+  interruptionLevel: "time-sensitive",
   payload: {
     "sender": "node-apn",
   },
@@ -102,6 +103,8 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `sound`             | `aps.sound`                 | `String` or `Object`|
 | `contentAvailable`  | `aps.content-available`     | `1`                 |
 | `mutableContent`    | `aps.mutable-content`       | `1`                 |
+| `targetContentIdentifier` | `aps.target-content-id` | `String`          |
+| `interruptionLevel` | `aps.interruption-level`    | `String`            |
 | `urlArgs`           | `aps.url-args`              | `Array`             |
 | `category`          | `aps.category`              | `String`            |
 | `threadId`          | `aps.thread-id`             | `String`            |
