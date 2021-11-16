@@ -42,7 +42,7 @@
     "coverage": "node_modules/.bin/nyc --reporter=lcov node_modules/.bin/mocha",
     "lint": "npm run eslint && npm run prettier",
     "eslint": "eslint .",
-    "prettier": "prettier --write {lib,test,examples}/{**/*,*}.js index.js",
+    "prettier": "prettier --write {lib,test,examples,mock}/{**/*,*}.js index.js",
     "test": "node_modules/.bin/mocha"
   },
   "jshintConfig": {
