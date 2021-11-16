@@ -236,7 +236,7 @@ describe('config', function () {
       });
 
       it('does not invoke prepareCertificate', function () {
-        const configuration = config({ token: { key, keyId, teamId } });
+        config({ token: { key, keyId, teamId } });
 
         expect(fakes.prepareCertificate).to.have.not.been.called;
       });

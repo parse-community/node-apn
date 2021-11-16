@@ -1,7 +1,40 @@
 const sinon = require('sinon');
 const validateCredentials = require('../../../lib/credentials/certificate/validate');
 
-let fakeCredentials;
+const fakeCredentials = function () {
+  return {
+    key: {
+      _fingerprint: 'fingerprint1',
+      fingerprint: function () {
+        return this._fingerprint;
+      },
+    },
+    certificates: [
+      {
+        _key: {
+          _fingerprint: 'fingerprint1',
+          fingerprint: function () {
+            return this._fingerprint;
+          },
+        },
+        _validity: {
+          notBefore: new Date(Date.now() - 100000),
+          notAfter: new Date(Date.now() + 100000),
+        },
+        key: function () {
+          return this._key;
+        },
+        validity: function () {
+          return this._validity;
+        },
+        environment: function () {
+          return { production: true, sandbox: false };
+        },
+      },
+    ],
+    production: true,
+  };
+};
 
 describe('validateCredentials', function () {
   let credentials;
@@ -93,38 +126,3 @@ describe('validateCredentials', function () {
     });
   });
 });
-
-fakeCredentials = function () {
-  return {
-    key: {
-      _fingerprint: 'fingerprint1',
-      fingerprint: function () {
-        return this._fingerprint;
-      },
-    },
-    certificates: [
-      {
-        _key: {
-          _fingerprint: 'fingerprint1',
-          fingerprint: function () {
-            return this._fingerprint;
-          },
-        },
-        _validity: {
-          notBefore: new Date(Date.now() - 100000),
-          notAfter: new Date(Date.now() + 100000),
-        },
-        key: function () {
-          return this._key;
-        },
-        validity: function () {
-          return this._validity;
-        },
-        environment: function () {
-          return { production: true, sandbox: false };
-        },
-      },
-    ],
-    production: true,
-  };
-};

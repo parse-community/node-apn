@@ -5,7 +5,7 @@ Send individualised notifications
 i.e. Account updates for users with one-or-more device tokens
 */
 
-const apn = require('apn');
+const apn = require('@parse/node-apn');
 
 const users = [
   { name: 'Wendy', devices: ['<insert device token>', '<insert device token>'] },

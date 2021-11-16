@@ -1,4 +1,6 @@
+const http2 = require('http2');
 const debug = require('debug')('apn');
+
 debug.log = console.log.bind(console);
 
 const credentials = require('./lib/credentials')({
@@ -11,8 +13,6 @@ const config = require('./lib/config')({
   prepareToken: credentials.token,
   prepareCA: credentials.ca,
 });
-
-const http2 = require('http2');
 
 const Client = require('./lib/client')({
   logger: debug,

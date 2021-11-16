@@ -1,7 +1,6 @@
 const VError = require('verror');
 const net = require('net');
 const http2 = require('http2');
-const util = require('util');
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
@@ -22,6 +21,7 @@ const Client = require('../lib/client')({
   config,
   http2,
 });
+
 debug.log = console.log.bind(console);
 
 // function builtNotification() {
@@ -408,7 +408,7 @@ describe('Client', () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
-      const session = stream.session;
+      const { session } = stream;
       const errorCode = 1;
       didGetRequest = true;
       session.goaway(errorCode);
@@ -445,7 +445,7 @@ describe('Client', () => {
     let responseTimeout = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
       setTimeout(() => {
-        const session = stream.session;
+        const { session } = stream;
         didGetRequest = true;
         if (session) {
           session.destroy();

@@ -3,7 +3,6 @@
 
 const VError = require('verror');
 const http2 = require('http2');
-const util = require('util');
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
