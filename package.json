@@ -28,8 +28,10 @@
     "chai": "^4.3.4",
     "chai-as-promised": "7.1.1",
     "codecov": "3.8.1",
+    "eslint": "^8.2.0",
     "mocha": "^8.3.2",
     "nyc": "15.1.0",
+    "prettier": "^2.4.1",
     "sinon": "^10.0.0",
     "sinon-chai": "^3.6.0"
   },
@@ -38,6 +40,9 @@
   },
   "scripts": {
     "coverage": "node_modules/.bin/nyc --reporter=lcov node_modules/.bin/mocha",
+    "lint": "npm run eslint && npm run prettier",
+    "eslint": "eslint .",
+    "prettier": "prettier --write {lib,test,examples}/{**/*,*}.js index.js",
     "test": "node_modules/.bin/mocha"
   },
   "jshintConfig": {
