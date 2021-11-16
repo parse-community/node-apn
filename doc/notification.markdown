@@ -106,6 +106,7 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `category`                 | `aps.category`              | `String`            |
 | `targetContentIdentifier`  | `aps.target-content-id`     | `String`            |
 | `threadId`                 | `aps.thread-id`             | `String`            |
+| `interruptionLevel`        | `aps.interruption-level`    | `String`            |
 | `mdm`                      | `mdm`                       | `String`            |
 
 When the notification is transmitted these properties will be added to the output before encoding.
