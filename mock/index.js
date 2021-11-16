@@ -1,4 +1,4 @@
-"use strict";
+
 
 const Client = require("./client")();
 const MultiClient = require("../lib/multiclient")({
