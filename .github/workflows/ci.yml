@@ -15,6 +15,8 @@ jobs:
             NODE_VERSION: 12
           - name: Node.js 14
             NODE_VERSION: 14
+          - name: Node.js 16
+            NODE_VERSION: 16
     runs-on: ubuntu-18.04
     timeout-minutes: 30
     steps:
@@ -31,5 +33,6 @@ jobs:
           restore-keys: |
               ${{ runner.os }}-node-${{ matrix.NODE_VERSION }}-
       - run: npm ci
+      - run: npm run lint
       - run: npm run coverage
       - run: bash <(curl -s https://codecov.io/bash)
