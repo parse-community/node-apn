@@ -1,4 +1,11 @@
-## Changelog
+# Changelog
+
+# 5.1.0
+
+### Features
+- Add support for iOS 15 property interruption-level ([#83](https://github.com/parse-community/node-apn/pull/83))
+- Add support for target-content-id notification property ([#84](https://github.com/parse-community/node-apn/pull/84))
+
 5.0.0
 * Drop support for node versions prior to 12 - those node versions have bugs in the http2 library.
 * Support MultiProvider and MultiClient to use a round-robin client for HTTP2.
