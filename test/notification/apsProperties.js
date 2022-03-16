@@ -104,19 +104,24 @@ describe('Notification', function () {
         });
 
         it('retains the alert body correctly', function () {
-          const payload = compiledOutput();
           expect(compiledOutput()).to.have.nested.deep.property('aps.alert.body', 'Good Morning');
         });
 
         it('sets the aps.alert.loc-key property', function () {
-          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.loc-key', 'good_morning');
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.loc-key',
+            'good_morning'
+          );
         });
       });
 
       describe('setLocKey', function () {
         it('is chainable', function () {
           expect(note.setLocKey('good_morning')).to.equal(note);
-          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.loc-key', 'good_morning');
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.loc-key',
+            'good_morning'
+          );
         });
       });
     });
@@ -288,14 +293,20 @@ describe('Notification', function () {
         });
 
         it('sets the aps.alert.title-loc-key property', function () {
-          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.title-loc-key', 'Warning');
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.title-loc-key',
+            'Warning'
+          );
         });
       });
 
       describe('setAlert', function () {
         it('is chainable', function () {
           expect(note.setTitleLocKey('greeting')).to.equal(note);
-          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.title-loc-key', 'greeting');
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.title-loc-key',
+            'greeting'
+          );
         });
       });
     });
@@ -397,7 +408,10 @@ describe('Notification', function () {
     describe('actionLocKey', function () {
       it('sets the aps.alert.action-loc-key property', function () {
         note.actionLocKey = 'reply_title';
-        expect(compiledOutput()).to.have.nested.deep.property('aps.alert.action-loc-key', 'reply_title');
+        expect(compiledOutput()).to.have.nested.deep.property(
+          'aps.alert.action-loc-key',
+          'reply_title'
+        );
       });
 
       context('alert is already an object', function () {
