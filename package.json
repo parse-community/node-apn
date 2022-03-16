@@ -39,11 +39,11 @@
     "access": "public"
   },
   "scripts": {
-    "coverage": "node_modules/.bin/nyc --reporter=lcov node_modules/.bin/mocha",
+    "coverage": "node_modules/.bin/nyc --reporter=lcov node_modules/.bin/mocha 'test/**/*.js'",
     "lint": "npm run eslint && npm run prettier",
     "eslint": "eslint .",
     "prettier": "prettier --write {lib,test,examples,mock}/{**/*,*}.js index.js",
-    "test": "node_modules/.bin/mocha"
+    "test": "node_modules/.bin/mocha 'test/**/*.js'"
   },
   "jshintConfig": {
     "node": true
