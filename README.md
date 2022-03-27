@@ -25,12 +25,10 @@ A Node.js module for interfacing with the Apple Push Notification service.
 # Features
 
 - Based on HTTP/2 based provider API
-- Maintains a connection to the server to maximise notification batching and throughput.
-- Automatically resends unsent notifications if an error occurs
+- Maintains a connection to the server to maximize notification batching and throughput.
+- Automatically re-sends unsent notifications if an error occurs
 
 # Installation
-
-[npm][] is the preferred installation method:
 
 ```bash
 $ npm install @parse/node-apn --save
