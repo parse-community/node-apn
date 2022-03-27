@@ -1,4 +1,7 @@
-# Changelog
+# 5.1.1
+
+# Bug Fixes
+- Various dependency upgrades to fix vulnerabilities
 
 # 5.1.0
 
