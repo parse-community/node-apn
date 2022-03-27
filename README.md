@@ -1,48 +1,52 @@
-[<p align="center"><img src="doc/logo.png" alt="node-apn" width="450" height="auto"></p>][node-apn]
+# Node APN <!-- omit in toc -->
 
-node-apn
-========
+[![Build Status](https://github.com/parse-community/node-apn/workflows/ci/badge.svg?branch=master)](https://github.com/parse-community/parse-server-push-adapter/actions?query=workflow%3Aci+branch%3Amaster)
+[![Snyk Badge](https://snyk.io/test/github/parse-community/node-apn/badge.svg)](https://snyk.io/test/github/parse-community/parse-server-push-adapter)
+[![Coverage](https://img.shields.io/codecov/c/github/parse-community/node-apn/master.svg)](https://codecov.io/github/parse-community/parse-server-push-adapter?branch=master)
+[![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/node-apn/releases)
 
-> A Node.js module for interfacing with the Apple Push Notification service.
+[![npm latest version](https://img.shields.io/npm/v/@parse/node-apn.svg)](https://www.npmjs.com/package/@parse/node-apn)
 
-<a href="https://github.com/parse-community/node-apn/actions?query=workflow%3Aci+branch%3Amaster">
-  <img alt="Build status" src="https://github.com/parse-community/node-apn/workflows/ci/badge.svg?branch=master">
-</a>
- <a href="http://codecov.io/github/parse-community/node-apn?branch=master"><img alt="Test coverage" src="http://codecov.io/github/parse-community/node-apn/coverage.svg?branch=master"></a>
+---
 
-[logo]:doc/logo.png
-[npm-image]:https://nodei.co/npm/@parse/node-apn.png?downloads=true
-[npm-url]:https://npmjs.com/package/@parse/node-apn
-[ci-image]:https://api.travis-ci.org/parse-community/node-apn.svg
-[ci-url]:https://travis-ci.org/parse-community/node-apn
+A Node.js module for interfacing with the Apple Push Notification service.
 
-## Features
+---
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Load in the module](#load-in-the-module)
+  - [Connecting](#connecting)
+    - [Connecting through an HTTP proxy](#connecting-through-an-http-proxy)
+    - [Using a pool of http/2 connections](#using-a-pool-of-http2-connections)
+  - [Sending a notification](#sending-a-notification)
+
+# Features
 
 - Based on HTTP/2 based provider API
-- Maintains a connection to the server to maximise notification batching and throughput.
-- Automatically resends unsent notifications if an error occurs
+- Maintains a connection to the server to maximize notification batching and throughput.
+- Automatically re-sends unsent notifications if an error occurs
 
-## Installation
-
-[npm][] is the preferred installation method:
+# Installation
 
 ```bash
 $ npm install @parse/node-apn --save
 ```
 
-## Quick Start
+# Quick Start
 
 This readme is a brief introduction, please refer to the full [documentation](doc/apn.markdown) in `doc/` for more details.
 
 If you have previously used v1.x and wish to learn more about what's changed in v2.0, please see [What's New](doc/whats-new.markdown)
 
-### Load in the module
+## Load in the module
 
 ```javascript
 var apn = require('@parse/node-apn');
 ```
 
-### Connecting
+## Connecting
 Create a new connection to the Apple Push Notification provider API, passing a dictionary of options to the constructor. You must supply your token credentials in the options.
 
 ```javascript
@@ -64,7 +68,7 @@ For more information about configuration options consult the [provider documenta
 
 Help with preparing the key and certificate files for connection can be found in the [wiki][certificateWiki]
 
-#### Connecting through an HTTP proxy
+### Connecting through an HTTP proxy
 
 If you need to connect through an HTTP proxy, you simply need to provide the `proxy: {host, port}` option when creating the provider. For example:
 
@@ -87,7 +91,7 @@ var apnProvider = new apn.Provider(options);
 
 The provider will first send an HTTP CONNECT request to the specified proxy in order to establish an HTTP tunnel. Once established, it will create a new secure connection to the Apple Push Notification provider API through the tunnel.
 
-#### Using a pool of http/2 connections
+### Using a pool of http/2 connections
 
 Because http/2 already uses multiplexing, you probably don't need to use more than one client unless you are hitting http/2 concurrent request limits.
 
@@ -110,7 +114,7 @@ var options = {
 var apnProvider = new apn.MultiProvider(options);
 ```
 
-### Sending a notification
+## Sending a notification
 To send a notification you will first need a device token from your app as a string
 
 ```javascript
@@ -147,66 +151,3 @@ This will result in the the following notification payload being sent to the dev
 You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
 
 If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
-
-## Troubleshooting
-
-You are encouraged to read the extremely informative [Troubleshooting Push Notifications][tn2265] Tech Note in the first instance, in case your query is answered there.
-
-## Support
-
-If you have any questions or difficulties working with the module, the [node-apn Google group][googlegroup] should be your first port of call.
-
-Please include as much detail as possible - especially debug logs. If the problem is reproducible, sample code is also extremely helpful. GitHub Issues should only be created for verified problems and enhancements, this will allow them to be tracked more easily.
-
-## Resources
-
-* [Local and Push Notification Programming Guide: APNs Overview][pl]
-* [Apple Technical Note: Troubleshooting Push Notifications][tn2265]
-* [List of Projects, Applications and Companies Using Node-apn][pacapn]
-
-## Credits
-
-Created by [Andrew Naylor][argon]
-
-Thanks to: [Ian Babrou][bobrik], [dgthistle][dgthistle], [Keith Larsen][keithnlarsen], [Mike P][mypark], [Greg Bergé][neoziro], [Asad ur Rehman][AsadR], [Nebojsa Sabovic][nsabovic], [Alberto Gimeno][gimenete], [Randall Tombaugh][rwtombaugh], [Michael Stewart][thegreatmichael], [Olivier Louvignes][mgcrea], [porsager][porsager], [Craig Hockenberry][chockenberry]
-
-## License
-
-Released under the MIT License
-
-> Copyright (c) 2013 Andrew Naylor
->
-> Permission is hereby granted, free of charge, to any person obtaining a copy
-> of this software and associated documentation files (the "Software"), to deal
-> in the Software without restriction, including without limitation the rights
-> to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-> copies of the Software, and to permit persons to whom the Software is
-> furnished to do so, subject to the following conditions:
->
-> The above copyright notice and this permission notice shall be included in
-> all copies or substantial portions of the Software.
->
-> THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-[npm]: https://npmjs.org
-[node-apn]: https://github.com/parse-community/node-apn
-[certificateWiki]:https://github.com/node-apn/node-apn/wiki/Preparing-Certificates "Preparing Certificates"
-[pl]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/APNSOverview.html "Local and Push Notification Programming Guide: APNs Overview"
-[tn2265]: http://developer.apple.com/library/ios/#technotes/tn2265/_index.html "Troubleshooting Push Notifications"
-[googlegroup]:https://groups.google.com/group/node-apn "node-apn Google Group"
-[pacapn]:https://github.com/node-apn/node-apn/wiki/Projects,-Applications,-and-Companies-Using-Node-apn "List of Projects, Applications and Companies Using node-apn"
-[argon]: https://github.com/argon
-[bobrik]: https://github.com/bobrik
-[dgthistle]: https://github.com/dgthistle
-[keithnlarsen]: https://github.com/keithnlarsen
-[mypark]: https://github.com/mypark
-[neoziro]: https://github.com/neoziro
-[AsadR]: https://github.com/AsadR
-[nsabovic]: https://github.com/nsabovic
-[gimenete]: https://github.com/gimenete
-[rwtombaugh]: https://github.com/rwtombaugh
-[thegreatmichael]: https://github.com/thegreatmichael
-[mgcrea]: https://github.com/mgcrea
-[porsager]: https://github.com/porsager
-[chockenberry]: https://github.com/chockenberry
-
