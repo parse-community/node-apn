@@ -1,4 +1,4 @@
-# 5.1.1
+# [5.1.1](https://github.com/parse-community/node-apn/compare/5.1.0...5.1.1) (2022-03-27)
 
 # Bug Fixes
 - Various dependency upgrades to fix vulnerabilities
