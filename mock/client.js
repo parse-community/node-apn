@@ -1,10 +1,6 @@
-"use strict";
-
-module.exports = function() {
-
+module.exports = function () {
   // Mocks of public API methods
-  function Client() {
-  }
+  function Client() {}
 
   Client.prototype.write = function mockWrite(notification, device) {
     return { device };
@@ -16,7 +12,9 @@ module.exports = function() {
       throw new Error(`Expected newLogger to be a function, got ${typeof newLogger}`);
     }
     if (newErrorLogger && typeof newErrorLogger !== 'function') {
-      throw new Error(`Expected newErrorLogger to be a function or null, got ${typeof newErrorLogger}`);
+      throw new Error(
+        `Expected newErrorLogger to be a function or null, got ${typeof newErrorLogger}`
+      );
     }
   };
 

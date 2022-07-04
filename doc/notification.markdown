@@ -86,26 +86,28 @@ The setters below provide a cleaner way to set properties defined by the Apple P
 
 This table shows the name of the setter, with the key-path of the underlying property it maps to and the expected value type.
 
-| Setter Name         | Target Property             | Type                |
-|---------------------|-----------------------------|---------------------|
-| `alert`             | `aps.alert`                 | `String` or `Object`|
-| `body`              | `aps.alert.body`            | `String`            |
-| `locKey`            | `aps.alert.loc-key`         | `String`            |
-| `locArgs`           | `aps.alert.loc-args`        | `Array`             |
-| `title`             | `aps.alert.title`           | `String`            |
-| `titleLocKey`       | `aps.alert.title-loc-key`   | `String`            |
-| `titleLocArgs`      | `aps.alert.title-loc-args`  | `Array`             |
-| `action`            | `aps.alert.action`          | `String`            |
-| `actionLocKey`      | `aps.alert.action-loc-key`  | `String`            |
-| `launchImage`       | `aps.launch-image`          | `String`            |
-| `badge`             | `aps.badge`                 | `Number`            |
-| `sound`             | `aps.sound`                 | `String` or `Object`|
-| `contentAvailable`  | `aps.content-available`     | `1`                 |
-| `mutableContent`    | `aps.mutable-content`       | `1`                 |
-| `urlArgs`           | `aps.url-args`              | `Array`             |
-| `category`          | `aps.category`              | `String`            |
-| `threadId`          | `aps.thread-id`             | `String`            |
-| `mdm`               | `mdm`                       | `String`            |
+| Setter Name                | Target Property             | Type                |
+|----------------------------|-----------------------------|---------------------|
+| `alert`                    | `aps.alert`                 | `String` or `Object`|
+| `body`                     | `aps.alert.body`            | `String`            |
+| `locKey`                   | `aps.alert.loc-key`         | `String`            |
+| `locArgs`                  | `aps.alert.loc-args`        | `Array`             |
+| `title`                    | `aps.alert.title`           | `String`            |
+| `titleLocKey`              | `aps.alert.title-loc-key`   | `String`            |
+| `titleLocArgs`             | `aps.alert.title-loc-args`  | `Array`             |
+| `action`                   | `aps.alert.action`          | `String`            |
+| `actionLocKey`             | `aps.alert.action-loc-key`  | `String`            |
+| `launchImage`              | `aps.launch-image`          | `String`            |
+| `badge`                    | `aps.badge`                 | `Number`            |
+| `sound`                    | `aps.sound`                 | `String` or `Object`|
+| `contentAvailable`         | `aps.content-available`     | `1`                 |
+| `mutableContent`           | `aps.mutable-content`       | `1`                 |
+| `urlArgs`                  | `aps.url-args`              | `Array`             |
+| `category`                 | `aps.category`              | `String`            |
+| `targetContentIdentifier`  | `aps.target-content-id`     | `String`            |
+| `threadId`                 | `aps.thread-id`             | `String`            |
+| `interruptionLevel`        | `aps.interruption-level`    | `String`            |
+| `mdm`                      | `mdm`                       | `String`            |
 
 When the notification is transmitted these properties will be added to the output before encoding.
 
