@@ -97,6 +97,8 @@ interface Aps {
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
   category?: string
+  targetContentIdentifier?: string
+  interruptionLevel?: string
 }
 
 export interface ResponseSent {
@@ -209,6 +211,8 @@ export class Notification {
   public collapseId: string;
   public pushType: NotificationPushType;
   public threadId: string;
+  public targetContentIdentifier?: string;
+  public interruptionLevel?: string;
 
   /**
    * This Object is JSON encoded and sent as the notification payload. When properties have been set on notification.aps (either directly or with convenience setters) these are added to the payload just before it is sent. If payload already contains an aps property it is replaced.
