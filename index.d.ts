@@ -71,6 +71,8 @@ export interface MultiProviderOptions extends ProviderOptions {
   clientCount?: number
 }
 
+export type ApsNotificationInterruptionLevel = 'passive' | 'active' | 'time-sensitive' | 'critical';
+
 interface ApsAlert {
   body?: string
   "loc-key"?: string
@@ -98,7 +100,7 @@ interface Aps {
   "url-args"?: string[]
   category?: string
   targetContentIdentifier?: string
-  interruptionLevel?: string
+  interruptionLevel?: ApsNotificationInterruptionLevel
 }
 
 export interface ResponseSent {
@@ -212,7 +214,7 @@ export class Notification {
   public pushType: NotificationPushType;
   public threadId: string;
   public targetContentIdentifier: string;
-  public interruptionLevel: string;
+  public interruptionLevel: ApsNotificationInterruptionLevel;
 
   /**
    * This Object is JSON encoded and sent as the notification payload. When properties have been set on notification.aps (either directly or with convenience setters) these are added to the payload just before it is sent. If payload already contains an aps property it is replaced.
@@ -236,7 +238,7 @@ export class Notification {
   /**
    * The value to specify for `payload.aps.alert` can be either a `String` or an `Object` as outlined by the payload documentation.
    */
-  public alert: string|NotificationAlertOptions;
+  public alert: string | NotificationAlertOptions;
   /**
    * Setting this to true will specify "content-available" in the payload when it is compiled.
    */
