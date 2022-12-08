@@ -174,10 +174,11 @@ describe('Provider', function () {
 
   describe('shutdown', function () {
     it('invokes shutdown on the client', function () {
+      const callback = sinon.spy();
       const provider = new Provider({});
-      provider.shutdown();
+      provider.shutdown(callback);
 
-      expect(fakes.client.shutdown).to.be.calledOnce;
+      expect(fakes.client.shutdown).to.be.calledOnceWithExactly(callback);
     });
   });
 });
