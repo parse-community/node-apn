@@ -521,6 +521,7 @@ describe('Client', () => {
           }, 1);
         });
       });
+      clientSocket.on('error', () => {});
     });
     await new Promise(resolve => proxy.listen(3128, resolve));
 
