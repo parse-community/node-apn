@@ -832,6 +832,142 @@ describe('Notification', function () {
       });
     });
 
+    describe('event', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+      });
+
+      it('can be set to a string', function () {
+        note.event = 'the-event';
+
+        expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+      });
+
+      it('can be set to undefined', function () {
+        note.event = 'the-event';
+        note.event = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+      });
+
+      describe('setEvent', function () {
+        it('is chainable', function () {
+          expect(note.setEvent('the-event')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+        });
+      });
+    });
+
+    describe('timestamp', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.timestamp');
+      });
+
+      it('can be set to a number', function () {
+        note.timestamp = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.timestamp', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.timestamp = 1234;
+        note.timestamp = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.timestamp');
+      });
+
+      describe('setTimestamp', function () {
+        it('is chainable', function () {
+          expect(note.setTimestamp(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.timestamp', 1234);
+        });
+      });
+    });
+
+    describe('relevance-score', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.relevance-score');
+      });
+
+      it('can be set to a number', function () {
+        note.relevanceScore = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.relevance-score', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.relevanceScore = 1234;
+        note.relevanceScore = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.relevance-score');
+      });
+
+      describe('setRelevanceScore', function () {
+        it('is chainable', function () {
+          expect(note.setRelevanceScore(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.relevance-score', 1234);
+        });
+      });
+    });
+
+    describe('stale-date', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.stale-date');
+      });
+
+      it('can be set to a number', function () {
+        note.staleDate = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.stale-date', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.staleDate = 1234;
+        note.staleDate = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.stale-date');
+      });
+
+      describe('setStaleDate', function () {
+        it('is chainable', function () {
+          expect(note.setStaleDate(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.stale-date', 1234);
+        });
+      });
+    });
+
+    describe('content-state', function () {
+      const payload = { foo: 'bar' };
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.content-state');
+      });
+
+      it('can be set to a object', function () {
+        note.contentState = payload;
+
+        expect(compiledOutput())
+          .to.have.nested.property('aps.content-state')
+          .that.deep.equals(payload);
+      });
+
+      it('can be set to undefined', function () {
+        note.contentState = payload;
+        note.contentState = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.content-state');
+      });
+
+      describe('setContentState', function () {
+        it('is chainable', function () {
+          expect(note.setContentState(payload)).to.equal(note);
+          console.log(compiledOutput());
+          expect(compiledOutput())
+            .to.have.nested.property('aps.content-state')
+            .that.deep.equals(payload);
+        });
+      });
+    });
+
     context('when no aps properties are set', function () {
       it('is not present', function () {
         expect(compiledOutput().aps).to.be.undefined;

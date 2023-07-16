@@ -107,6 +107,11 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `targetContentIdentifier`  | `aps.target-content-id`     | `String`            |
 | `threadId`                 | `aps.thread-id`             | `String`            |
 | `interruptionLevel`        | `aps.interruption-level`    | `String`            |
+| `relevanceScore`           | `aps.relevance-score`       | `Number`            |
+| `timestamp`                | `aps.timestamp`             | `Number`            |
+| `staleDate`                | `aps.staleDate`             | `Number`            |
+| `event`                    | `aps.event`                 | `String`            |
+| `contentState`             | `aps.content-state`         | `Object`            |
 | `mdm`                      | `mdm`                       | `String`            |
 
 When the notification is transmitted these properties will be added to the output before encoding.

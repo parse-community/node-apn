@@ -1,3 +1,10 @@
+# [5.2.0](https://github.com/parse-community/node-apn/compare/5.1.3...5.2.0) (2023-07-16)
+
+
+### Features
+
+* Add support for Live Activity with ActivityKit push notifications ([#130](https://github.com/parse-community/node-apn/issues/130)) ([80717cd](https://github.com/parse-community/node-apn/commit/80717cd6c3a3341c90d3a6ea73fe64c663de8c8a))
+
 ## [5.1.3](https://github.com/parse-community/node-apn/compare/5.1.2...5.1.3) (2022-03-27)
 
 
