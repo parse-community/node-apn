@@ -110,7 +110,7 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `relevanceScore`           | `aps.relevance-score`       | `Number`            |
 | `timestamp`                | `aps.timestamp`             | `Number`            |
 | `staleDate`                | `aps.staleDate`             | `Number`            |
-| `event`                    | `aps.event`                 | `String`            |
+| `events`                   | `aps.events`                | `String`            |
 | `contentState`             | `aps.content-state`         | `Object`            |
 | `mdm`                      | `mdm`                       | `String`            |
 

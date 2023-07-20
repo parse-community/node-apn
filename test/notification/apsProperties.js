@@ -832,28 +832,28 @@ describe('Notification', function () {
       });
     });
 
-    describe('event', function () {
+    describe('events', function () {
       it('defaults to undefined', function () {
-        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+        expect(compiledOutput()).to.not.have.nested.property('aps.events');
       });
 
       it('can be set to a string', function () {
-        note.event = 'the-event';
+        note.events = 'the-event';
 
-        expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+        expect(compiledOutput()).to.have.nested.property('aps.events', 'the-event');
       });
 
       it('can be set to undefined', function () {
-        note.event = 'the-event';
-        note.event = undefined;
+        note.events = 'the-event';
+        note.events = undefined;
 
-        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+        expect(compiledOutput()).to.not.have.nested.property('aps.events');
       });
 
-      describe('setEvent', function () {
+      describe('setEvents', function () {
         it('is chainable', function () {
-          expect(note.setEvent('the-event')).to.equal(note);
-          expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+          expect(note.setEvents('the-event')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.events', 'the-event');
         });
       });
     });
