@@ -1,3 +1,10 @@
+## [5.2.2](https://github.com/parse-community/node-apn/compare/5.2.1...5.2.2) (2023-07-20)
+
+
+### Bug Fixes
+
+* Shutdown callback is not passed from provider to client ([#118](https://github.com/parse-community/node-apn/issues/118)) ([9fa197f](https://github.com/parse-community/node-apn/commit/9fa197fd92da5a56f5bdaf7d8df8dab6e85af0d1))
+
 ## [5.2.1](https://github.com/parse-community/node-apn/compare/5.2.0...5.2.1) (2023-07-16)
 
 
