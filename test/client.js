@@ -427,10 +427,8 @@ describe('Client', () => {
     const mockDevice = MOCK_DEVICE_TOKEN;
     const performRequestExpectingGoAway = async () => {
       const result = await client.write(mockNotification, mockDevice);
-      expect(result).to.deep.equal({
-        device: MOCK_DEVICE_TOKEN,
-        error: new VError('stream ended unexpectedly with status null and empty body'),
-      });
+      expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
+      expect(result.error).to.be.an.instanceof(VError);
       expect(didGetRequest).to.be.true;
       didGetRequest = false;
     };

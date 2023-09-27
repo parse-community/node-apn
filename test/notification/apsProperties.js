@@ -960,7 +960,6 @@ describe('Notification', function () {
       describe('setContentState', function () {
         it('is chainable', function () {
           expect(note.setContentState(payload)).to.equal(note);
-          console.log(compiledOutput());
           expect(compiledOutput())
             .to.have.nested.property('aps.content-state')
             .that.deep.equals(payload);
