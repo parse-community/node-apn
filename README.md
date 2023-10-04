@@ -163,7 +163,7 @@ note.pushType = "liveactivity",
 note.relevanceScore = 75,
 note.timestamp = Math.floor(Date.now() / 1000); // Current time
 note.staleDate = Math.floor(Date.now() / 1000) + (8 * 3600); // Expires 8 hour from now.
-note.events = "update"
+note.event = "update"
 note.contentState = {}
 ```
 
@@ -179,7 +179,7 @@ This will result in the the following notification payload being sent to the dev
 
 
 ```json
-{"messageFrom":"John Appleseed","aps":{"badge":3,"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message", "relevance-score":75,"timestamp":1683129662,"stale-date":1683216062,"events":"update","content-state":{}}}
+{"messageFrom":"John Appleseed","aps":{"badge":3,"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message", "relevance-score":75,"timestamp":1683129662,"stale-date":1683216062,"event":"update","content-state":{}}}
 ```
 
 You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
