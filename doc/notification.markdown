@@ -112,6 +112,7 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `staleDate`                | `aps.staleDate`             | `Number`            |
 | `event`                    | `aps.event`                 | `String`            |
 | `contentState`             | `aps.content-state`         | `Object`            |
+| `dismissalDate`            | `aps.dismissal-date`        | `Number`            |
 | `mdm`                      | `mdm`                       | `String`            |
 
 When the notification is transmitted these properties will be added to the output before encoding.

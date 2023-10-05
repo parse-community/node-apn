@@ -858,6 +858,32 @@ describe('Notification', function () {
       });
     });
 
+    describe('dismissalDate', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
+      });
+
+      it('can be set to a number', function () {
+        note.dismissalDate = '123456';
+
+        expect(compiledOutput()).to.have.nested.property('aps.dismissal-date', 123456);
+      });
+
+      it('can be set to undefined', function () {
+        note.dismissalDate = '123456';
+        note.dismissalDate = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
+      });
+
+      describe('setDismissalDate', function () {
+        it('is chainable', function () {
+          expect(note.setDismissalDate(123456)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.dismissal-date', 123456);
+        });
+      });
+    });
+
     describe('timestamp', function () {
       it('defaults to undefined', function () {
         expect(compiledOutput()).to.not.have.nested.property('aps.timestamp');
