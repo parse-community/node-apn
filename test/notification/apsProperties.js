@@ -858,19 +858,19 @@ describe('Notification', function () {
       });
     });
 
-    describe('dismissalDate', function () {
+    describe('dismissal-date', function () {
       it('defaults to undefined', function () {
         expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
       });
 
       it('can be set to a number', function () {
-        note.dismissalDate = '123456';
+        note.dismissalDate = 123456;
 
         expect(compiledOutput()).to.have.nested.property('aps.dismissal-date', 123456);
       });
 
       it('can be set to undefined', function () {
-        note.dismissalDate = '123456';
+        note.dismissalDate = 123456;
         note.dismissalDate = undefined;
 
         expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
