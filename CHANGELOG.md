@@ -1,3 +1,10 @@
+# [6.1.0](https://github.com/parse-community/node-apn/compare/6.0.2...6.1.0) (2024-09-16)
+
+
+### Features
+
+* Add `dismissal-date` property to Live Activity notifications ([#152](https://github.com/parse-community/node-apn/issues/152)) ([d863f2e](https://github.com/parse-community/node-apn/commit/d863f2e6ce2a58ee92371d69ad8966dd9927e90f))
+
 ## [6.0.2](https://github.com/parse-community/node-apn/compare/6.0.1...6.0.2) (2024-09-10)
 
 

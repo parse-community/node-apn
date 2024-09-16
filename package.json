@@ -1,7 +1,7 @@
 {
   "name": "@parse/node-apn",
   "description": "An interface to the Apple Push Notification service for Node.js",
-  "version": "6.0.2",
+  "version": "6.1.0",
   "author": "Parse Platform, Andrew Naylor <argon@mkbot.net>",
   "keywords": [
     "apple",
