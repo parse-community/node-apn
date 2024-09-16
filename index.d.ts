@@ -61,7 +61,7 @@ export interface ProviderOptions {
   /**
    * Connect through an HTTP proxy
    */
-  proxy?: { host: string, port: number|string }
+  proxy?: { host: string, port: number|string, username?: string, password?: string }
 }
 
 export interface MultiProviderOptions extends ProviderOptions {
