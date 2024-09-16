@@ -1,3 +1,29 @@
+## [6.0.2](https://github.com/parse-community/node-apn/compare/6.0.1...6.0.2) (2024-09-10)
+
+
+### Bug Fixes
+
+* Incorrect field name `events` instead of `event` in Live Activity push notification payload ([#148](https://github.com/parse-community/node-apn/issues/148)) ([5876a59](https://github.com/parse-community/node-apn/commit/5876a59fcd04c53ccd85ae8ea06a51e2cf119993))
+
+## [6.0.1](https://github.com/parse-community/node-apn/compare/6.0.0...6.0.1) (2023-10-20)
+
+
+### Bug Fixes
+
+* Minimum required Node version in `engines.node` has not been upgraded to Node 14 ([#138](https://github.com/parse-community/node-apn/issues/138)) ([4eb3686](https://github.com/parse-community/node-apn/commit/4eb3686e30c225d8d83c55cf7a5f11bc807a9ef4))
+
+# [6.0.0](https://github.com/parse-community/node-apn/compare/5.2.3...6.0.0) (2023-10-19)
+
+
+### Features
+
+* Add support for Node 18, 20 drop support for Node 12 ([#137](https://github.com/parse-community/node-apn/issues/137)) ([f203bc1](https://github.com/parse-community/node-apn/commit/f203bc1c6d1e72a5b0689368220ec109d347003a))
+
+
+### BREAKING CHANGES
+
+* This release removes support for Node 12; the minimum required version is Node 14. ([f203bc1](f203bc1))
+
 ## [5.2.3](https://github.com/parse-community/node-apn/compare/5.2.2...5.2.3) (2023-07-21)
 
 

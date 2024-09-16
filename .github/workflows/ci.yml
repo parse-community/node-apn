@@ -11,12 +11,16 @@ jobs:
     strategy:
       matrix:
         include:
-          - name: Node.js 12
-            NODE_VERSION: 12
           - name: Node.js 14
             NODE_VERSION: 14
           - name: Node.js 16
             NODE_VERSION: 16
+          - name: Node.js 18
+            NODE_VERSION: 18
+          - name: Node.js 20
+            NODE_VERSION: 20
+      fail-fast: false
+    name: ${{ matrix.name }}
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
