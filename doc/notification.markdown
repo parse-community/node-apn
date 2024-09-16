@@ -95,6 +95,8 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `title`                    | `aps.alert.title`           | `String`            |
 | `titleLocKey`              | `aps.alert.title-loc-key`   | `String`            |
 | `titleLocArgs`             | `aps.alert.title-loc-args`  | `Array`             |
+| `subtitleLocKey`           | `aps.alert.subtitle-loc-key`  | `String`            |
+| `subtitleLocArgs`          | `aps.alert.subtitle-loc-args` | `Array`             |
 | `action`                   | `aps.alert.action`          | `String`            |
 | `actionLocKey`             | `aps.alert.action-loc-key`  | `String`            |
 | `launchImage`              | `aps.launch-image`          | `String`            |

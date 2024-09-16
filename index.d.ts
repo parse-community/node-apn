@@ -78,6 +78,8 @@ interface ApsAlert {
   title?: string
   "title-loc-key"?: string
   "title-loc-args"?: any[]
+  "subtitle-loc-key"?: string
+  "subtitle-loc-args"?: any[]
   action?: string
   "action-loc-key"?: string
 }
@@ -173,6 +175,8 @@ export interface NotificationAlertOptions {
   body: string;
   "title-loc-key"?: string;
   "title-loc-args"?: string[];
+  "subtitle-loc-key"?: string;
+  "subtitle-loc-args"?: string[];
   "action-loc-key"?: string;
   "loc-key"?: string;
   "loc-args"?: string[];
