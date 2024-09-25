@@ -261,6 +261,7 @@ describe('Notification', function () {
         });
       });
     });
+
     describe('titleLocKey', function () {
       it('sets the aps.alert.title-loc-key property', function () {
         note.titleLocKey = 'Warning';
@@ -349,6 +350,108 @@ describe('Notification', function () {
         it('sets the aps.alert.title-loc-args property', function () {
           expect(compiledOutput())
             .to.have.nested.deep.property('aps.alert.title-loc-args')
+            .that.deep.equals(['Hi there']);
+        });
+      });
+
+      describe('setTitleLocArgs', function () {
+        it('is chainable', function () {
+          expect(note.setTitleLocArgs(['iPhone 6s'])).to.equal(note);
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert.title-loc-args')
+            .that.deep.equals(['iPhone 6s']);
+        });
+      });
+    });
+
+    describe('subtitleLocKey', function () {
+      it('sets the aps.alert.subtitle-loc-key property', function () {
+        note.subtitleLocKey = 'Warning';
+        expect(compiledOutput()).to.have.nested.deep.property('aps.alert.subtitle-loc-key', 'Warning');
+      });
+
+      context('alert is already an object', function () {
+        beforeEach(function () {
+          note.alert = { body: 'Test', 'launch-image': 'test.png' };
+          note.subtitleLocKey = 'Warning';
+        });
+
+        it('contains all expected properties', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert').that.deep.equals({
+            body: 'Test',
+            'launch-image': 'test.png',
+            'subtitle-loc-key': 'Warning',
+          });
+        });
+      });
+
+      context('alert is already a string', function () {
+        beforeEach(function () {
+          note.alert = 'Hello, world';
+          note.subtitleLocKey = 'Warning';
+        });
+
+        it('retains the alert body correctly', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.body', 'Hello, world');
+        });
+
+        it('sets the aps.alert.subtitle-loc-key property', function () {
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.subtitle-loc-key',
+            'Warning'
+          );
+        });
+      });
+
+      describe('setAlert', function () {
+        it('is chainable', function () {
+          expect(note.setSubtitleLocKey('greeting')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.subtitle-loc-key',
+            'greeting'
+          );
+        });
+      });
+    });
+
+    describe('subtitleLocArgs', function () {
+      it('sets the aps.alert.subtitle-loc-args property', function () {
+        note.subtitleLocArgs = ['arg1', 'arg2'];
+        expect(compiledOutput())
+          .to.have.nested.deep.property('aps.alert.subtitle-loc-args')
+          .that.deep.equals(['arg1', 'arg2']);
+      });
+
+      context('alert is already an object', function () {
+        beforeEach(function () {
+          note.alert = { body: 'Test', 'launch-image': 'test.png' };
+          note.subtitleLocArgs = ['Hi there'];
+        });
+
+        it('contains all expected properties', function () {
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert')
+            .that.deep.equals({
+              body: 'Test',
+              'launch-image': 'test.png',
+              'subtitle-loc-args': ['Hi there'],
+            });
+        });
+      });
+
+      context('alert is already a string', function () {
+        beforeEach(function () {
+          note.alert = 'Hello, world';
+          note.subtitleLocArgs = ['Hi there'];
+        });
+
+        it('retains the alert body', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.body', 'Hello, world');
+        });
+
+        it('sets the aps.alert.subtitle-loc-args property', function () {
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert.subtitle-loc-args')
             .that.deep.equals(['Hi there']);
         });
       });

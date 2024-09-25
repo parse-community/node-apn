@@ -1,3 +1,10 @@
+# [6.2.0](https://github.com/parse-community/node-apn/compare/6.1.0...6.2.0) (2024-09-25)
+
+
+### Features
+
+* Add fields `subtitleLocKey`, `subtitleLocArgs` for localized subtitle and arguments in notifications ([#154](https://github.com/parse-community/node-apn/issues/154)) ([c885405](https://github.com/parse-community/node-apn/commit/c885405e10c9d1ec15968c42d410ce4f56dfbf04))
+
 # [6.1.0](https://github.com/parse-community/node-apn/compare/6.0.2...6.1.0) (2024-09-16)
 
 
