@@ -1,3 +1,24 @@
+# [6.2.0](https://github.com/parse-community/node-apn/compare/6.1.0...6.2.0) (2024-09-25)
+
+
+### Features
+
+* Add fields `subtitleLocKey`, `subtitleLocArgs` for localized subtitle and arguments in notifications ([#154](https://github.com/parse-community/node-apn/issues/154)) ([c885405](https://github.com/parse-community/node-apn/commit/c885405e10c9d1ec15968c42d410ce4f56dfbf04))
+
+# [6.1.0](https://github.com/parse-community/node-apn/compare/6.0.2...6.1.0) (2024-09-16)
+
+
+### Features
+
+* Add `dismissal-date` property to Live Activity notifications ([#152](https://github.com/parse-community/node-apn/issues/152)) ([d863f2e](https://github.com/parse-community/node-apn/commit/d863f2e6ce2a58ee92371d69ad8966dd9927e90f))
+
+## [6.0.2](https://github.com/parse-community/node-apn/compare/6.0.1...6.0.2) (2024-09-10)
+
+
+### Bug Fixes
+
+* Incorrect field name `events` instead of `event` in Live Activity push notification payload ([#148](https://github.com/parse-community/node-apn/issues/148)) ([5876a59](https://github.com/parse-community/node-apn/commit/5876a59fcd04c53ccd85ae8ea06a51e2cf119993))
+
 ## [6.0.1](https://github.com/parse-community/node-apn/compare/6.0.0...6.0.1) (2023-10-20)
 
 

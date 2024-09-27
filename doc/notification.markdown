@@ -95,6 +95,8 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `title`                    | `aps.alert.title`           | `String`            |
 | `titleLocKey`              | `aps.alert.title-loc-key`   | `String`            |
 | `titleLocArgs`             | `aps.alert.title-loc-args`  | `Array`             |
+| `subtitleLocKey`           | `aps.alert.subtitle-loc-key`  | `String`            |
+| `subtitleLocArgs`          | `aps.alert.subtitle-loc-args` | `Array`             |
 | `action`                   | `aps.alert.action`          | `String`            |
 | `actionLocKey`             | `aps.alert.action-loc-key`  | `String`            |
 | `launchImage`              | `aps.launch-image`          | `String`            |
@@ -110,8 +112,9 @@ This table shows the name of the setter, with the key-path of the underlying pro
 | `relevanceScore`           | `aps.relevance-score`       | `Number`            |
 | `timestamp`                | `aps.timestamp`             | `Number`            |
 | `staleDate`                | `aps.staleDate`             | `Number`            |
-| `events`                   | `aps.events`                | `String`            |
+| `event`                    | `aps.event`                 | `String`            |
 | `contentState`             | `aps.content-state`         | `Object`            |
+| `dismissalDate`            | `aps.dismissal-date`        | `Number`            |
 | `mdm`                      | `mdm`                       | `String`            |
 
 When the notification is transmitted these properties will be added to the output before encoding.
