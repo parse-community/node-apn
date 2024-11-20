@@ -61,7 +61,7 @@ export interface ProviderOptions {
   /**
    * Connect through an HTTP proxy
    */
-  proxy?: { host: string, port: number|string }
+  proxy?: { host: string, port: number|string, user?: string, pass?: string }
 }
 
 export interface MultiProviderOptions extends ProviderOptions {
@@ -156,7 +156,7 @@ export class MultiProvider extends EventEmitter {
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
    * In order to log, these functions must have a property '.enabled' that is true.
-   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
   setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
