@@ -167,7 +167,7 @@ export class MultiProvider extends EventEmitter {
   shutdown(callback?: () => void): void;
 }
 
-export type NotificationPushType = 'background' | 'alert' | 'voip';
+export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity';
 
 export interface NotificationAlertOptions {
   title?: string;
@@ -222,7 +222,7 @@ export class Notification {
    */
   public priority: number;
   /**
-   * The type of the notification.
+   * The type of the notification. The available types are: `alert`, `background`, `liveactivity`, and `pushtotalk`.
    */
   public pushType: NotificationPushType;
 
