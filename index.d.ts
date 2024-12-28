@@ -222,7 +222,7 @@ export class Notification {
    */
   public priority: number;
   /**
-   * The type of the notification. The available types are: `alert`, `background`, `liveactivity`, and `pushtotalk`.
+   * The type of the notification.
    */
   public pushType: NotificationPushType;
 
