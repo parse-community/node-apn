@@ -198,7 +198,7 @@ Provide one of the following values:
 
 (Required when delivering notifications to devices running iOS 13 and later, or watchOS 6 and later. Ignored on earlier system versions.)
 
-The type of the notification. The value of this header is `alert`, `background`, `liveactivity`, or `pushtotalk`. Specify `alert` when the delivery of your notification displays an alert, plays a sound, or badges your app's icon. Specify `background` for silent notifications that do not interact with the user. Specify `liveactivity` for live activities. Specify `pushtotalk` for notifications that provide information about updates to your application’s push to talk services.
+The type of the notification. The value of this header is `alert`, `background`, `pushtotalk`, or `liveactivity`. Specify `alert` when the delivery of your notification displays an alert, plays a sound, or badges your app's icon. Specify `background` for silent notifications that do not interact with the user. Specify `pushtotalk` for notifications that provide information about updates to your application’s push to talk services. Specify `liveactivity` for live activities.
 
 The value of this header must accurately reflect the contents of your notification's payload. If there is a mismatch, or if the header is missing on required systems, APNs may delay the delivery of the notification or drop it altogether.
 
