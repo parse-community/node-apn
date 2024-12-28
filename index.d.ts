@@ -226,6 +226,9 @@ export class Notification {
    */
   public pushType: NotificationPushType;
 
+  /**
+   * An app-specific identifier for grouping related notifications.
+   */
   public threadId: string;
 
   /**
