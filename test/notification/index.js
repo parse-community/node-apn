@@ -184,7 +184,7 @@ describe('Notification', function () {
         expect(note.headers()).to.have.property('apns-channel-id', 'io.apn.channel');
       });
     });
-  
+
     context('pushType is set', function () {
       it('contains the apns-push-type header', function () {
         note.pushType = 'alert';
