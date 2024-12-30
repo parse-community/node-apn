@@ -3,6 +3,11 @@
 
 const VError = require('verror');
 const http2 = require('http2');
+const {
+  HTTP2_METHOD_POST,
+  // HTTP2_METHOD_GET,
+  // HTTP2_METHOD_DELETE
+} = http2.constants;
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
@@ -63,6 +68,11 @@ describe('MultiClient', () => {
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
   const MOCK_DEVICE_TOKEN = 'abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123';
+  // const BUNDLE_ID = 'com.node.apn';
+  // const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
+  // const PATH_CHANNELS_ALL = `/1/apps/${BUNDLE_ID}/all-channels`;
+  const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`;
+  // const PATH_BROADCAST = `/4/broadcasts/apps/${BUNDLE_ID}`;
 
   // Create an insecure http2 client for unit testing.
   // (APNS would use https://, not http://)
@@ -172,9 +182,10 @@ describe('MultiClient', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const mockDevice = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, mockDevice);
-      expect(result).to.deep.equal({ device: MOCK_DEVICE_TOKEN });
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
+      expect(result).to.deep.equal({ method, path });
       expect(didRequest).to.be.true;
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
@@ -225,9 +236,10 @@ describe('MultiClient', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const mockDevice = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, mockDevice);
-      expect(result).to.deep.equal({ device: MOCK_DEVICE_TOKEN });
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
+      expect(result).to.deep.equal({ method, path });
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     // Validate that when multiple valid requests arrive concurrently,
@@ -276,10 +288,12 @@ describe('MultiClient', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const mockDevice = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, mockDevice);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
       expect(result).to.deep.equal({
-        device: MOCK_DEVICE_TOKEN,
+        method,
+        path,
         response: {
           reason: 'BadDeviceToken',
         },
@@ -324,10 +338,12 @@ describe('MultiClient', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const mockDevice = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, mockDevice);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
       expect(result).to.exist;
-      expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
+      expect(result.method).to.equal(method);
+      expect(result.path).to.equal(path);
       expect(result.error).to.be.an.instanceof(VError);
       expect(result.error.message).to.have.string('stream ended unexpectedly');
     };
@@ -369,10 +385,12 @@ describe('MultiClient', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const mockDevice = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, mockDevice);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
       // Should not happen, but if it does, the promise should resolve with an error
-      expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
+      expect(result.method).to.equal(method);
+      expect(result.path).to.equal(path);
       expect(
         result.error.message.startsWith(
           'Unexpected error processing APNs response: Unexpected token'
@@ -405,11 +423,13 @@ describe('MultiClient', () => {
       headers: mockHeaders,
       body: MOCK_BODY,
     };
-    const mockDevice = MOCK_DEVICE_TOKEN;
     const performRequestExpectingTimeout = async () => {
-      const result = await client.write(mockNotification, mockDevice);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
       expect(result).to.deep.equal({
-        device: MOCK_DEVICE_TOKEN,
+        method,
+        path,
         error: new VError('apn write timeout'),
       });
       expect(didGetRequest).to.be.true;
@@ -447,10 +467,12 @@ describe('MultiClient', () => {
       headers: mockHeaders,
       body: MOCK_BODY,
     };
-    const mockDevice = MOCK_DEVICE_TOKEN;
     const performRequestExpectingGoAway = async () => {
-      const result = await client.write(mockNotification, mockDevice);
-      expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
+      expect(result.method).to.equal(method);
+      expect(result.path).to.equal(path);
       expect(result.error).to.be.an.instanceof(VError);
       expect(didGetRequest).to.be.true;
       didGetRequest = false;
@@ -484,11 +506,13 @@ describe('MultiClient', () => {
       headers: mockHeaders,
       body: MOCK_BODY,
     };
-    const mockDevice = MOCK_DEVICE_TOKEN;
     const performRequestExpectingDisconnect = async () => {
-      const result = await client.write(mockNotification, mockDevice);
+      const method = HTTP2_METHOD_POST;
+      const path = PATH_DEVICE;
+      const result = await client.write(method, path, mockNotification);
       expect(result).to.deep.equal({
-        device: MOCK_DEVICE_TOKEN,
+        method,
+        path,
         error: new VError('stream ended unexpectedly with status null and empty body'),
       });
       expect(didGetRequest).to.be.true;
