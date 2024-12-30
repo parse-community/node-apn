@@ -1,9 +1,7 @@
 const sinon = require('sinon');
 const EventEmitter = require('events');
 const http2 = require('http2');
-const {
-  HTTP2_METHOD_POST,
-} = http2.constants;
+const { HTTP2_METHOD_POST } = http2.constants;
 
 describe('Provider', function () {
   let fakes, Provider;
@@ -16,7 +14,7 @@ describe('Provider', function () {
 
     fakes.Client.returns(fakes.client);
     fakes.client.write = sinon.stub();
-    fakes.client.shutdown  = sinon.stub();
+    fakes.client.shutdown = sinon.stub();
 
     Provider = require('../lib/provider')(fakes);
   });
