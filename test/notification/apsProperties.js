@@ -367,7 +367,10 @@ describe('Notification', function () {
     describe('subtitleLocKey', function () {
       it('sets the aps.alert.subtitle-loc-key property', function () {
         note.subtitleLocKey = 'Warning';
-        expect(compiledOutput()).to.have.nested.deep.property('aps.alert.subtitle-loc-key', 'Warning');
+        expect(compiledOutput()).to.have.nested.deep.property(
+          'aps.alert.subtitle-loc-key',
+          'Warning'
+        );
       });
 
       context('alert is already an object', function () {

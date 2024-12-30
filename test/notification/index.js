@@ -169,6 +169,22 @@ describe('Notification', function () {
       });
     });
 
+    context('requestId is set', function () {
+      it('contains the apns-request-id header', function () {
+        note.requestId = 'io.apn.request';
+
+        expect(note.headers()).to.have.property('apns-request-id', 'io.apn.request');
+      });
+    });
+
+    context('channelId is set', function () {
+      it('contains the apns-request-id header', function () {
+        note.channelId = 'io.apn.channel';
+
+        expect(note.headers()).to.have.property('apns-channel-id', 'io.apn.channel');
+      });
+    });
+
     context('pushType is set', function () {
       it('contains the apns-push-type header', function () {
         note.pushType = 'alert';
