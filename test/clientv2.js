@@ -2,6 +2,12 @@ const VError = require('verror');
 const net = require('net');
 const http2 = require('http2');
 
+const {
+  HTTP2_METHOD_POST,
+  // HTTP2_METHOD_GET,
+  // HTTP2_METHOD_DELETE
+} = http2.constants;
+
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
   logger: debug,
@@ -33,14 +39,11 @@ describe('Client', () => {
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
   const MOCK_DEVICE_TOKEN = 'abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123';
-  const BUNDLE_ID = 'com.node.apn';
-  const METHOD_POST = 'POST';
-  const METHOD_GET = 'GET';
-  const METHOD_DELETE = 'DELETE';
-  const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
-  const PATH_CHANNELS_ALL = `/1/apps/${BUNDLE_ID}/all-channels`;
-  const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`; 
-  const PATH_BROADCAST = `/4/broadcasts/apps/${BUNDLE_ID}`;
+  // const BUNDLE_ID = 'com.node.apn';
+  // const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
+  // const PATH_CHANNELS_ALL = `/1/apps/${BUNDLE_ID}/all-channels`;
+  const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`;
+  // const PATH_BROADCAST = `/4/broadcasts/apps/${BUNDLE_ID}`;
 
   // Create an insecure http2 client for unit testing.
   // (APNS would use https://, not http://)
@@ -107,7 +110,7 @@ describe('Client', () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
-    const method = METHOD_POST;
+    const method = HTTP2_METHOD_POST;
     const path = PATH_DEVICE;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -161,7 +164,7 @@ describe('Client', () => {
     this.timeout(10000);
     let establishedConnections = 0;
     let requestsServed = 0;
-    const method = METHOD_POST;
+    const method = HTTP2_METHOD_POST;
     const path = PATH_DEVICE;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -240,7 +243,7 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = METHOD_POST;
+      const method = HTTP2_METHOD_POST;
       const path = PATH_DEVICE;
       const result = await client.writeV2(method, path, mockNotification);
       expect(result).to.deep.equal({
@@ -289,7 +292,7 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = METHOD_POST;
+      const method = HTTP2_METHOD_POST;
       const path = PATH_DEVICE;
       const result = await client.writeV2(method, path, mockNotification);
       expect(result).to.exist;
@@ -336,7 +339,7 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = METHOD_POST;
+      const method = HTTP2_METHOD_POST;
       const path = PATH_DEVICE;
       const result = await client.writeV2(method, path, mockNotification);
       // Should not happen, but if it does, the promise should resolve with an error
@@ -375,7 +378,7 @@ describe('Client', () => {
       body: MOCK_BODY,
     };
     const performRequestExpectingTimeout = async () => {
-      const method = METHOD_POST;
+      const method = HTTP2_METHOD_POST;
       const path = PATH_DEVICE;
       const result = await client.writeV2(method, path, mockNotification);
       expect(result).to.deep.equal({
@@ -401,7 +404,7 @@ describe('Client', () => {
   it('Handles goaway frames', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
-    const method = METHOD_POST;
+    const method = HTTP2_METHOD_POST;
     const path = PATH_DEVICE;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
       const { session } = stream;
@@ -458,7 +461,7 @@ describe('Client', () => {
       body: MOCK_BODY,
     };
     const performRequestExpectingDisconnect = async () => {
-      const method = METHOD_POST;
+      const method = HTTP2_METHOD_POST;
       const path = PATH_DEVICE;
       const result = await client.writeV2(method, path, mockNotification);
       expect(result).to.deep.equal({
@@ -487,7 +490,7 @@ describe('Client', () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
-    const method = METHOD_POST;
+    const method = HTTP2_METHOD_POST;
     const path = PATH_DEVICE;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
@@ -556,9 +559,7 @@ describe('Client', () => {
     proxy.close();
   });
 
-  describe('write', () => {
-  });
+  describe('write', () => {});
 
-  describe('shutdown', () => {
-  });
+  describe('shutdown', () => {});
 });

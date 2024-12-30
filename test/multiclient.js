@@ -373,7 +373,11 @@ describe('MultiClient', () => {
       const result = await client.write(mockNotification, mockDevice);
       // Should not happen, but if it does, the promise should resolve with an error
       expect(result.device).to.equal(MOCK_DEVICE_TOKEN);
-      expect(result.error.message.startsWith('Unexpected error processing APNs response: Unexpected token')).to.equal(true);
+      expect(
+        result.error.message.startsWith(
+          'Unexpected error processing APNs response: Unexpected token'
+        )
+      ).to.equal(true);
     };
     await runRequestWithInternalServerError();
     await runRequestWithInternalServerError();
