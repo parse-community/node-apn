@@ -1,5 +1,9 @@
 const sinon = require('sinon');
 const EventEmitter = require('events');
+const http2 = require('http2');
+const {
+  HTTP2_METHOD_POST,
+} = http2.constants;
 
 describe('Provider', function () {
   let fakes, Provider;
@@ -12,6 +16,7 @@ describe('Provider', function () {
 
     fakes.Client.returns(fakes.client);
     fakes.client.write = sinon.stub();
+    fakes.client.writeV2 = sinon.stub();
     fakes.client.shutdown = sinon.stub();
 
     Provider = require('../lib/provider')(fakes);
@@ -50,11 +55,12 @@ describe('Provider', function () {
           provider = new Provider({ address: 'testapi' });
 
           fakes.client.write.onCall(0).returns(Promise.resolve({ device: 'abcd1234' }));
+          fakes.client.writeV2.onCall(0).returns(Promise.resolve({ device: 'abcd1234' }));
         });
 
         it('invokes the writer with correct `this`', function () {
           return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            expect(fakes.client.write).to.be.calledOn(fakes.client);
+            expect(fakes.client.writeV2).to.be.calledOn(fakes.client);
           });
         });
 
@@ -65,14 +71,16 @@ describe('Provider', function () {
               headers: notification.headers(),
               body: notification.compile(),
             };
-            expect(fakes.client.write).to.be.calledOnce;
-            expect(fakes.client.write).to.be.calledWith(builtNotification, 'abcd1234');
+            const method = HTTP2_METHOD_POST;
+            const path = `/3/device/abcd1234`;
+            expect(fakes.client.writeV2).to.be.calledOnce;
+            expect(fakes.client.writeV2).to.be.calledWith(method, path, builtNotification);
           });
         });
 
         it('does not pass the array index to writer', function () {
           return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            expect(fakes.client.write.firstCall.args[2]).to.be.undefined;
+            expect(fakes.client.writeV2.firstCall.args[3]).to.be.undefined;
           });
         });
 
@@ -91,6 +99,13 @@ describe('Provider', function () {
           const provider = new Provider({ address: 'testapi' });
 
           fakes.client.write.onCall(0).returns(
+            Promise.resolve({
+              device: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          fakes.client.writeV2.onCall(0).returns(
             Promise.resolve({
               device: 'abcd1234',
               status: '400',
@@ -133,6 +148,7 @@ describe('Provider', function () {
 
           for (let i = 0; i < fakes.resolutions.length; i++) {
             fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
+            fakes.client.writeV2.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
           }
 
           promise = provider.send(

@@ -26,8 +26,7 @@ const MultiClient = require('./lib/multiclient')({
 
 const Provider = require('./lib/provider')({
   logger: debug,
-  Client,
-  http2,
+  Client
 });
 
 const MultiProvider = require('./lib/provider')({
