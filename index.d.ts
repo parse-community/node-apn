@@ -178,7 +178,7 @@ export class MultiProvider extends EventEmitter {
   shutdown(callback?: () => void): void;
 }
 
-export type NotificationPushType = 'background' | 'alert' | 'voip' | 'location' | 'complication' | 'fileprovider' | 'mdm' | 'pushtotalk' | 'liveactivity';
+export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
 
 export interface NotificationAlertOptions {
   title?: string;
@@ -222,6 +222,18 @@ export class Notification {
    */
   public expiry: number;
   /**
+   * Multiple notifications with same collapse identifier are displayed to the user as a single notification. The value should not exceed 64 bytes.
+   */
+  public collapseId: string;
+  /**
+   * Multiple notifications with same collapse identifier are displayed to the user as a single notification. The value should not exceed 64 bytes.
+   */
+  public requestId: string;
+  /**
+   * An optional custom request identifier that’s returned back in the response. The request identifier must be encoded as a UUID string.
+   */
+  public channelId: string;
+  /**
    * Provide one of the following values:
    *
    * - 10 - The push message is sent immediately. (Default)
@@ -229,9 +241,14 @@ export class Notification {
    * - 5 - The push message is sent at a time that conserves power on the device receiving it.
    */
   public priority: number;
-
-  public collapseId: string;
+  /**
+   * The type of the notification.
+   */
   public pushType: NotificationPushType;
+
+  /**
+   * An app-specific identifier for grouping related notifications.
+   */
   public threadId: string;
 
   /**

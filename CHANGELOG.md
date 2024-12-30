@@ -1,3 +1,10 @@
+# [6.3.0](https://github.com/parse-community/node-apn/compare/6.2.1...6.3.0) (2024-12-28)
+
+
+### Features
+
+* Add support for broadcast push notifications ([#163](https://github.com/parse-community/node-apn/issues/163)) ([ccd0781](https://github.com/parse-community/node-apn/commit/ccd0781d3c4f56ce8356eeca0fa050100967c6ae))
+
 ## [6.2.1](https://github.com/parse-community/node-apn/compare/6.2.0...6.2.1) (2024-11-14)
 
 
