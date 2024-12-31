@@ -115,6 +115,18 @@ interface Aps {
 export interface ResponseSent {
   device: string;
 }
+
+export interface BroadcastResponse {
+  bundleId: string;
+  "apns-request-id"?: string;
+  "apns-channel-id"?: string;
+  "message-storage-policy"?: number;
+  "push-type"?: string;
+  "channels"?: string[];
+}
+
+export interface LoggerResponse extends Partial<ResponseSent>, Partial<BroadcastResponse> {}
+
 export interface ResponseFailure {
   device: string;
   error?: Error;
@@ -125,42 +137,56 @@ export interface ResponseFailure {
   };
 }
 
-export interface Responses {
-  sent:   ResponseSent[];
-  failed: ResponseFailure[];
+export interface BroadcastResponseFailure extends Omit<ResponseFailure, "device"> {
+  bundleId: string;
+}
+
+export interface LoggerResponseFailure extends Partial<ResponseFailure>, Partial<BroadcastResponseFailure> {}
+
+export interface Responses<R,F> {
+  sent: R[];
+  failed: F[];
 }
 
 export class Provider extends EventEmitter {
   constructor(options: ProviderOptions);
   /**
-   * This is main interface for sending notifications. Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+   * This is main interface for sending notifications.
+   *  
+   * @remarks
+   * Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
    *
-   * A "recipient" is a String containing the hex-encoded device token.
+   * @param notification - The notification to send.
+   * @param recipients - A String or an Array of Strings containing the hex-encoded device token.
    */
-  send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+  send(notification: Notification, recipients: string|string[]): Promise<Responses<ResponseSent,ResponseFailure>>;
 
   /**
    * Manage channels using a specific action.
    *
-   * An "action" specifies what to do with the channel.
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId - The bundleId for your application.
+   * @param action - Specifies the action to perform on the channel(s).
    */
-  manageChannels(notification: Notification, bundleId: string, action: ChannelAction): Promise<Responses>;
+  manageChannels(notifications: Notification|Notification[], bundleId: string, action: ChannelAction): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
 
   /**
-   * Broadcast to a channel.
+   * Broadcast notificaitons to channel(s).
    *
-   * An "action" specifies what to do with the channel.
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId: The bundleId for your application.
    */
-  broadcast(notification: Notification, bundleId: string): Promise<Responses>;
+  broadcast(notifications: Notification|Notification[], bundleId: string): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
 
   /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
+   * @remarks
    * In order to log, these functions must have a property '.enabled' that is true.
    * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
-  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses<LoggerResponse,LoggerResponseFailure>>;
 
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
@@ -171,20 +197,25 @@ export class Provider extends EventEmitter {
 export class MultiProvider extends EventEmitter {
   constructor(options: MultiProviderOptions);
   /**
-   * This is main interface for sending notifications. Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+   * This is main interface for sending notifications.
+   *  
+   * @remarks
+   * Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
    *
-   * A "recipient" is a String containing the hex-encoded device token.
+   * @param notification - The notification to send.
+   * @param recipients - A String or an Array of Strings containing the hex-encoded device token.
    */
-  send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+  send(notification: Notification, recipients: string|string[]): Promise<Responses<ResponseSent,ResponseFailure>>;
 
   /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
+   * @remarks
    * In order to log, these functions must have a property '.enabled' that is true.
-   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
-  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses<LoggerResponse,LoggerResponseFailure>>;
 
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
@@ -234,21 +265,13 @@ export class Notification {
    */
   public channelId: string;
   /**
-   * The UNIX timestamp representing when the notification should expire. This does not contribute to the 2048 byte payload size limit. An expiry of 0 indicates that the notification expires immediately.
-   */
-  public expiry: number;
-  /**
    * Multiple notifications with same collapse identifier are displayed to the user as a single notification. The value should not exceed 64 bytes.
    */
   public collapseId: string;
   /**
-   * Multiple notifications with same collapse identifier are displayed to the user as a single notification. The value should not exceed 64 bytes.
+   * The UNIX timestamp representing when the notification should expire. This does not contribute to the 2048 byte payload size limit. An expiry of 0 indicates that the notification expires immediately.
    */
-  public requestId: string;
-  /**
-   * An optional custom request identifier that’s returned back in the response. The request identifier must be encoded as a UUID string.
-   */
-  public channelId: string;
+  public expiry: number;
   /**
    * Provide one of the following values:
    *
@@ -261,7 +284,6 @@ export class Notification {
    * The type of the notification.
    */
   public pushType: NotificationPushType;
-
   /**
    * An app-specific identifier for grouping related notifications.
    */
