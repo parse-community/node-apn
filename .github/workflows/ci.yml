@@ -24,13 +24,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Use Node.js ${{ matrix.NODE_VERSION }}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.NODE_VERSION }}
       - name: Cache Node.js modules
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: ~/.npm
           key: ${{ runner.os }}-node-${{ matrix.NODE_VERSION }}-${{ hashFiles('**/package-lock.json') }}
@@ -39,4 +39,8 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run coverage
-      - run: bash <(curl -s https://codecov.io/bash)
+        uses: codecov/codecov-action@v4
+        with:
+          # Set to `true` once codecov token bug is fixed; https://github.com/parse-community/parse-server/issues/9129
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
