@@ -140,6 +140,20 @@ export class Provider extends EventEmitter {
   send(notification: Notification, recipients: string|string[]): Promise<Responses>;
 
   /**
+   * Manage channels using a specific action.
+   *
+   * An "action" specifies what to do with the channel.
+   */
+  manageChannels(notification: Notification, bundleId: string, action: ChannelAction): Promise<Responses>;
+
+  /**
+   * Broadcast to a channel.
+   *
+   * An "action" specifies what to do with the channel.
+   */
+  broadcast(notification: Notification, bundleId: string): Promise<Responses>;
+
+  /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
    * In order to log, these functions must have a property '.enabled' that is true.
@@ -177,6 +191,8 @@ export class MultiProvider extends EventEmitter {
    */
   shutdown(callback?: () => void): void;
 }
+
+export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
 
 export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
 
