@@ -165,8 +165,9 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const result = await client.write(method, path, mockNotification);
-      expect(result).to.deep.equal({ method, path });
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result).to.deep.equal({ device });
       expect(didRequest).to.be.true;
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
@@ -219,8 +220,9 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const result = await client.write(method, path, mockNotification);
-      expect(result).to.deep.equal({ method, path });
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result).to.deep.equal({ device });
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     // Validate that when multiple valid requests arrive concurrently,
@@ -269,12 +271,10 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = HTTP2_METHOD_POST;
-      const path = PATH_DEVICE;
-      const result = await client.write(method, path, mockNotification);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
       expect(result).to.deep.equal({
-        method: method,
-        path: path,
+        device,
         response: {
           reason: 'BadDeviceToken',
         },
@@ -318,12 +318,10 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = HTTP2_METHOD_POST;
-      const path = PATH_DEVICE;
-      const result = await client.write(method, path, mockNotification);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
       expect(result).to.exist;
-      expect(result.method).to.equal(method);
-      expect(result.path).to.equal(path);
+      expect(result.device).to.equal(device);
       expect(result.error).to.be.an.instanceof(VError);
       expect(result.error.message).to.have.string('stream ended unexpectedly');
     };
@@ -365,12 +363,10 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const method = HTTP2_METHOD_POST;
-      const path = PATH_DEVICE;
-      const result = await client.write(method, path, mockNotification);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
       // Should not happen, but if it does, the promise should resolve with an error
-      expect(result.method).to.equal(method);
-      expect(result.path).to.equal(path);
+      expect(result.device).to.equal(device);
       expect(
         result.error.message.startsWith(
           'Unexpected error processing APNs response: Unexpected token'
@@ -404,12 +400,10 @@ describe('Client', () => {
       body: MOCK_BODY,
     };
     const performRequestExpectingTimeout = async () => {
-      const method = HTTP2_METHOD_POST;
-      const path = PATH_DEVICE;
-      const result = await client.write(method, path, mockNotification);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
       expect(result).to.deep.equal({
-        method: method,
-        path: path,
+        device,
         error: new VError('apn write timeout'),
       });
       expect(didGetRequest).to.be.true;
@@ -430,8 +424,6 @@ describe('Client', () => {
   it('Handles goaway frames', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
-    const method = HTTP2_METHOD_POST;
-    const path = PATH_DEVICE;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
       const { session } = stream;
       const errorCode = 1;
@@ -450,9 +442,9 @@ describe('Client', () => {
       body: MOCK_BODY,
     };
     const performRequestExpectingGoAway = async () => {
-      const result = await client.write(method, path, mockNotification);
-      expect(result.method).to.equal(method);
-      expect(result.path).to.equal(path);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result.device).to.equal(device);
       expect(result.error).to.be.an.instanceof(VError);
       expect(didGetRequest).to.be.true;
       didGetRequest = false;
@@ -487,12 +479,10 @@ describe('Client', () => {
       body: MOCK_BODY,
     };
     const performRequestExpectingDisconnect = async () => {
-      const method = HTTP2_METHOD_POST;
-      const path = PATH_DEVICE;
-      const result = await client.write(method, path, mockNotification);
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
       expect(result).to.deep.equal({
-        method: method,
-        path: path,
+        device,
         error: new VError('stream ended unexpectedly with status null and empty body'),
       });
       expect(didGetRequest).to.be.true;
@@ -563,8 +553,9 @@ describe('Client', () => {
         headers: mockHeaders,
         body: MOCK_BODY,
       };
-      const result = await client.write(method, path, mockNotification);
-      expect(result).to.deep.equal({ method, path });
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result).to.deep.equal({ device });
       expect(didRequest).to.be.true;
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed

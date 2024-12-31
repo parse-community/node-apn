@@ -1,7 +1,5 @@
 const sinon = require('sinon');
 const EventEmitter = require('events');
-const http2 = require('http2');
-const { HTTP2_METHOD_POST } = http2.constants;
 
 describe('Provider', function () {
   let fakes, Provider;
@@ -67,16 +65,20 @@ describe('Provider', function () {
               headers: notification.headers(),
               body: notification.compile(),
             };
-            const method = HTTP2_METHOD_POST;
-            const path = `/3/device/abcd1234`;
+            const device = 'abcd1234';
             expect(fakes.client.write).to.be.calledOnce;
-            expect(fakes.client.write).to.be.calledWith(method, path, builtNotification);
+            expect(fakes.client.write).to.be.calledWith(
+              builtNotification,
+              device,
+              'device',
+              'post'
+            );
           });
         });
 
         it('does not pass the array index to writer', function () {
           return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            expect(fakes.client.write.firstCall.args[3]).to.be.undefined;
+            expect(fakes.client.write.firstCall.args[4]).to.be.undefined;
           });
         });
 
