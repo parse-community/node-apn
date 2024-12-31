@@ -44,3 +44,6 @@ jobs:
           # Set to `true` once codecov token bug is fixed; https://github.com/parse-community/parse-server/issues/9129
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
