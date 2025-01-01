@@ -223,9 +223,9 @@ export class MultiProvider extends EventEmitter {
   shutdown(callback?: () => void): void;
 }
 
-export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
-
 export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
+
+export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
 
 export interface NotificationAlertOptions {
   title?: string;
