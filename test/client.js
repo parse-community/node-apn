@@ -275,7 +275,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       expect(receivedError).to.exist;
@@ -328,7 +328,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       expect(receivedError).to.exist;
@@ -378,7 +378,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       // Should not happen, but if it does, the promise should resolve with an error
@@ -421,7 +421,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       expect(receivedError).to.exist;
@@ -469,7 +469,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       expect(receivedError).to.exist;
@@ -512,7 +512,7 @@ describe('Client', () => {
       let receivedError;
       try {
         await client.write(mockNotification, device, 'device', 'post');
-      } catch(e) {
+      } catch (e) {
         receivedError = e;
       }
       expect(receivedError).to.exist;
