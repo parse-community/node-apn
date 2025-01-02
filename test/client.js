@@ -1216,7 +1216,7 @@ describe('Client', () => {
   });
 });
 
-describe('ManageBroadcastClient', () => {
+describe('ManageChannelsClient', () => {
   let server;
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';

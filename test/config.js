@@ -25,10 +25,10 @@ describe('config', function () {
       production: false,
       address: 'api.sandbox.push.apple.com',
       port: 443,
-      manageBroadcastAddress: 'api-manage-broadcast.sandbox.push.apple.com',
-      manageBroadcastPort: 2195,
+      manageChannelsAddress: 'api-manage-broadcast.sandbox.push.apple.com',
+      manageChannelsPort: 2195,
       proxy: null,
-      manageBroadcastProxy: null,
+      manageChannelsProxy: null,
       rejectUnauthorized: true,
       connectionRetryLimit: 2,
       heartBeat: 60000,
@@ -91,7 +91,7 @@ describe('config', function () {
     });
   });
 
-  describe('manageBroadcastAddress configuration', function () {
+  describe('manageChannelsAddress configuration', function () {
     let originalEnv;
 
     before(function () {
@@ -109,58 +109,58 @@ describe('config', function () {
     it('should use api-manage-broadcast.sandbox.push.apple.com as the default connection address', function () {
       const testConfig = config();
       expect(testConfig).to.have.property(
-        'manageBroadcastAddress',
+        'manageChannelsAddress',
         'api-manage-broadcast.sandbox.push.apple.com'
       );
-      expect(testConfig).to.have.property('manageBroadcastPort', 2195);
+      expect(testConfig).to.have.property('manageChannelsPort', 2195);
     });
 
     it('should use api-manage-broadcast.push.apple.com when NODE_ENV=production', function () {
       process.env.NODE_ENV = 'production';
       const testConfig = config();
       expect(testConfig).to.have.property(
-        'manageBroadcastAddress',
+        'manageChannelsAddress',
         'api-manage-broadcast.push.apple.com'
       );
-      expect(testConfig).to.have.property('manageBroadcastPort', 2196);
+      expect(testConfig).to.have.property('manageChannelsPort', 2196);
     });
 
     it('should give precedence to production flag over NODE_ENV=production', function () {
       process.env.NODE_ENV = 'production';
       const testConfig = config({ production: false });
       expect(testConfig).to.have.property(
-        'manageBroadcastAddress',
+        'manageChannelsAddress',
         'api-manage-broadcast.sandbox.push.apple.com'
       );
-      expect(testConfig).to.have.property('manageBroadcastPort', 2195);
+      expect(testConfig).to.have.property('manageChannelsPort', 2195);
     });
 
     it('should use api-manage-broadcast.push.apple.com when production:true', function () {
       const testConfig = config({ production: true });
       expect(testConfig).to.have.property(
-        'manageBroadcastAddress',
+        'manageChannelsAddress',
         'api-manage-broadcast.push.apple.com'
       );
-      expect(testConfig).to.have.property('manageBroadcastPort', 2196);
+      expect(testConfig).to.have.property('manageChannelsPort', 2196);
     });
 
     it('should use a custom address and default port when passed', function () {
       const testAddress = 'testaddress';
       const testPort = 2195;
-      const testConfig = config({ manageBroadcastAddress: testAddress });
-      expect(testConfig).to.have.property('manageBroadcastAddress', testAddress);
-      expect(testConfig).to.have.property('manageBroadcastPort', testPort);
+      const testConfig = config({ manageChannelsAddress: testAddress });
+      expect(testConfig).to.have.property('manageChannelsAddress', testAddress);
+      expect(testConfig).to.have.property('manageChannelsPort', testPort);
     });
 
     it('should use a custom address and port when passed', function () {
       const testAddress = 'testaddress';
       const testPort = 445;
       const testConfig = config({
-        manageBroadcastAddress: testAddress,
-        manageBroadcastPort: testPort,
+        manageChannelsAddress: testAddress,
+        manageChannelsPort: testPort,
       });
-      expect(testConfig).to.have.property('manageBroadcastAddress', testAddress);
-      expect(testConfig).to.have.property('manageBroadcastPort', testPort);
+      expect(testConfig).to.have.property('manageChannelsAddress', testAddress);
+      expect(testConfig).to.have.property('manageChannelsPort', testPort);
     });
   });
 
