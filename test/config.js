@@ -30,7 +30,7 @@ describe('config', function () {
       proxy: null,
       manageBroadcastProxy: null,
       rejectUnauthorized: true,
-      connectionRetryLimit: 10,
+      connectionRetryLimit: 2,
       heartBeat: 60000,
       requestTimeout: 5000,
     });
