@@ -1,8 +1,8 @@
 # Node APN <!-- omit in toc -->
 
-[![Build Status](https://github.com/parse-community/node-apn/workflows/ci/badge.svg?branch=master)](https://github.com/parse-community/parse-server-push-adapter/actions?query=workflow%3Aci+branch%3Amaster)
+[![Build Status](https://github.com/parse-community/node-apn/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/parse-community/node-apn/actions/workflows/ci.yml?query=workflow%3Aci+branch%3Amaster)
 [![Snyk Badge](https://snyk.io/test/github/parse-community/node-apn/badge.svg)](https://snyk.io/test/github/parse-community/parse-server-push-adapter)
-[![Coverage](https://img.shields.io/codecov/c/github/parse-community/node-apn/master.svg)](https://codecov.io/github/parse-community/parse-server-push-adapter?branch=master)
+[![Coverage](https://codecov.io/github/parse-community/node-apn/branch/master/graph/badge.svg)](https://app.codecov.io/github/parse-community/node-apn/tree/master)
 [![auto-release](https://img.shields.io/badge/%F0%9F%9A%80-auto--release-9e34eb.svg)](https://github.com/parse-community/node-apn/releases)
 
 [![npm latest version](https://img.shields.io/npm/v/@parse/node-apn.svg)](https://www.npmjs.com/package/@parse/node-apn)
