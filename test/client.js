@@ -272,8 +272,14 @@ describe('Client', () => {
         body: MOCK_BODY,
       };
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result).to.deep.equal({
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError).to.deep.equal({
         device,
         response: {
           reason: 'BadDeviceToken',
@@ -319,11 +325,16 @@ describe('Client', () => {
         body: MOCK_BODY,
       };
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result).to.exist;
-      expect(result.device).to.equal(device);
-      expect(result.error).to.be.an.instanceof(VError);
-      expect(result.error.message).to.have.string('stream ended unexpectedly');
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.device).to.equal(device);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('stream ended unexpectedly');
     };
     await runRequestWithInternalServerError();
     await runRequestWithInternalServerError();
@@ -364,11 +375,17 @@ describe('Client', () => {
         body: MOCK_BODY,
       };
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
       // Should not happen, but if it does, the promise should resolve with an error
-      expect(result.device).to.equal(device);
+      expect(receivedError).to.exist;
+      expect(receivedError.device).to.equal(device);
       expect(
-        result.error.message.startsWith(
+        receivedError.error.message.startsWith(
           'Unexpected error processing APNs response: Unexpected token'
         )
       ).to.equal(true);
@@ -401,8 +418,14 @@ describe('Client', () => {
     };
     const performRequestExpectingTimeout = async () => {
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result).to.deep.equal({
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError).to.deep.equal({
         device,
         error: new VError('apn write timeout'),
       });
@@ -443,9 +466,15 @@ describe('Client', () => {
     };
     const performRequestExpectingGoAway = async () => {
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result.device).to.equal(device);
-      expect(result.error).to.be.an.instanceof(VError);
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.device).to.equal(device);
+      expect(receivedError.error).to.be.an.instanceof(VError);
       expect(didGetRequest).to.be.true;
       didGetRequest = false;
     };
@@ -480,8 +509,14 @@ describe('Client', () => {
     };
     const performRequestExpectingDisconnect = async () => {
       const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result).to.deep.equal({
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch(e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError).to.deep.equal({
         device,
         error: new VError('stream ended unexpectedly with status null and empty body'),
       });
