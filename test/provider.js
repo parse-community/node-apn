@@ -54,13 +54,12 @@ describe('Provider', function () {
 
         it('invokes the writer with correct `this`', async () => {
           await provider.send(notificationDouble(), 'abcd1234');
-          
           expect(fakes.client.write).to.be.calledOn(fakes.client);
         });
 
         it('writes the notification to the client once', async () => {
           await provider.send(notificationDouble(), 'abcd1234');
-          
+
           const notification = notificationDouble();
           const builtNotification = {
             headers: notification.headers(),
@@ -68,23 +67,16 @@ describe('Provider', function () {
           };
           const device = 'abcd1234';
           expect(fakes.client.write).to.be.calledOnce;
-          expect(fakes.client.write).to.be.calledWith(
-            builtNotification,
-            device,
-            'device',
-            'post'
-          );
+          expect(fakes.client.write).to.be.calledWith(builtNotification, device, 'device', 'post');
         });
 
         it('does not pass the array index to writer', async () => {
           await provider.send(notificationDouble(), 'abcd1234');
-          
           expect(fakes.client.write.firstCall.args[4]).to.be.undefined;
         });
 
         it('resolves with the device token in the sent array', async () => {
           const result = await provider.send(notificationDouble(), 'abcd1234');
-          
           expect(result).to.deep.equal({
             sent: [{ device: 'abcd1234' }],
             failed: [],
@@ -93,7 +85,6 @@ describe('Provider', function () {
       });
 
       context('error occurs', async () => {
-
         it('resolves with the device token, status code and response in the failed array', async () => {
           const provider = new Provider({ address: 'testapi' });
 
@@ -105,7 +96,7 @@ describe('Provider', function () {
             })
           );
           const result = await provider.send(notificationDouble(), 'abcd1234');
-  
+
           expect(result).to.deep.equal({
             sent: [],
             failed: [{ device: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } }],
@@ -152,20 +143,20 @@ describe('Provider', function () {
 
         it('resolves with the device token, status code and response or error of the unsent notifications', async () => {
           expect(response.failed[3].error).to.be.an.instanceof(Error);
-            response.failed[3].error = { message: response.failed[3].error.message };
-            expect(response.failed).to.deep.equal(
-              [
-                { device: 'adfe5969', status: '400', response: { reason: 'MissingTopic' } },
-                {
-                  device: 'abcd1335',
-                  status: '410',
-                  response: { reason: 'BadDeviceToken', timestamp: 123456789 },
-                },
-                { device: 'aabbc788', status: '413', response: { reason: 'PayloadTooLarge' } },
-                { device: 'fbcde238', error: { message: 'connection failed' } },
-              ],
-              `Unexpected result: ${JSON.stringify(response.failed)}`
-            );
+          response.failed[3].error = { message: response.failed[3].error.message };
+          expect(response.failed).to.deep.equal(
+            [
+              { device: 'adfe5969', status: '400', response: { reason: 'MissingTopic' } },
+              {
+                device: 'abcd1335',
+                status: '410',
+                response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+              },
+              { device: 'aabbc788', status: '413', response: { reason: 'PayloadTooLarge' } },
+              { device: 'fbcde238', error: { message: 'connection failed' } },
+            ],
+            `Unexpected result: ${JSON.stringify(response.failed)}`
+          );
         });
       });
     });
