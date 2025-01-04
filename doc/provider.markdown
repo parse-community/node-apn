@@ -65,7 +65,7 @@ When the returned `Promise` resolves, its value will be an Object containing two
 
 An array of device tokens to which the notification was successfully sent and accepted by Apple.
 
-Being `sent` does **not** guaranteed the notification will be _delivered_, other unpredictable factors - including whether the device is reachable - can ultimately prevent delivery.
+Being `sent` does **not** guarantee the notification will be _delivered_, other unpredictable factors - including whether the device is reachable - can ultimately prevent delivery.
 
 #### failed
 
