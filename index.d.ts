@@ -100,7 +100,8 @@ interface Aps {
   "url-args"?: string[]
   category?: string
   "thread-id"?: string
-  "interruption-level"?: string
+  "target-content-id"?: string 
+  "interruption-level"?: string | ApsNotificationInterruptionLevel
   "relevance-score"?: number
   "filter-criteria"?: string
   "stale-date"?: number
@@ -226,6 +227,8 @@ export class MultiProvider extends EventEmitter {
 export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
 
 export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
+
+export type ApsNotificationInterruptionLevel = 'passive' | 'active' | 'time-sensitive' | 'critical';
 
 export interface NotificationAlertOptions {
   title?: string;

@@ -1688,6 +1688,91 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(3);
   });
 
+  it('Throws error on unknown action type', async () => {
+    let didGetRequest = false;
+    let establishedConnections = 0;
+    const responseTimeout = 0;
+    server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
+      setTimeout(() => {
+        const { session } = stream;
+        didGetRequest = true;
+        if (session) {
+          session.destroy();
+        }
+      }, responseTimeout);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    client = createClient(TEST_PORT);
+
+    const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
+    await onListeningPromise;
+
+    const mockHeaders = { 'apns-someheader': 'somevalue' };
+    const mockNotification = {
+      headers: mockHeaders,
+      body: MOCK_BODY,
+    };
+    const performRequestExpectingDisconnect = async () => {
+      const bundleId = BUNDLE_ID;
+      const type = 'hello';
+      let receivedError;
+      try {
+        await client.write(mockNotification, bundleId, type, 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('not supported');
+    };
+    await performRequestExpectingDisconnect();
+    expect(didGetRequest).to.be.false;
+    expect(establishedConnections).to.equal(0);
+  });
+
+  it('Throws error on unknown method', async () => {
+    let didGetRequest = false;
+    let establishedConnections = 0;
+    const responseTimeout = 0;
+    server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
+      setTimeout(() => {
+        const { session } = stream;
+        didGetRequest = true;
+        if (session) {
+          session.destroy();
+        }
+      }, responseTimeout);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    client = createClient(TEST_PORT);
+
+    const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
+    await onListeningPromise;
+
+    const mockHeaders = { 'apns-someheader': 'somevalue' };
+    const mockNotification = {
+      headers: mockHeaders,
+      body: MOCK_BODY,
+    };
+    const performRequestExpectingDisconnect = async () => {
+      const bundleId = BUNDLE_ID;
+      const method = 'hello';
+      let receivedError;
+      try {
+        await client.write(mockNotification, bundleId, 'channels', method);
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.bundleId).to.equal(bundleId);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('invalid httpMethod');
+    };
+    await performRequestExpectingDisconnect();
+    expect(didGetRequest).to.be.false;
+    expect(establishedConnections).to.equal(0);
+  });
+
   it('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
