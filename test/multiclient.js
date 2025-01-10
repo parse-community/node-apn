@@ -1164,7 +1164,7 @@ describe('MultiClient', () => {
   });
 });
 
-describe('ManageBroadcastMultiClient', () => {
+describe('ManageChannelsMultiClient', () => {
   let server;
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
@@ -1182,14 +1182,14 @@ describe('ManageBroadcastMultiClient', () => {
   // but that's not the most important point of these tests)
   const createClient = (port, timeout = 500) => {
     const mc = new MultiClient({
-      port: TEST_PORT,
-      address: '127.0.0.1',
+      manageChannelsAddress: '127.0.0.1',
+      manageChannelsPort: TEST_PORT,
       clientCount: 2,
     });
     mc.clients.forEach(c => {
       c._mockOverrideUrl = `http://127.0.0.1:${port}`;
-      c.config.port = port;
-      c.config.address = '127.0.0.1';
+      c.config.manageChannelsPort = port;
+      c.config.manageChannelsAddress = '127.0.0.1';
       c.config.requestTimeout = timeout;
     });
     return mc;
@@ -1414,9 +1414,9 @@ describe('ManageBroadcastMultiClient', () => {
     await runRequestWithBadDeviceToken();
     expect(establishedConnections).to.equal(2); // should establish a connection to the server and reuse it
     expect(infoMessages).to.deep.equal([
-      'Session connected',
+      'ManageChannelsSession connected',
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
-      'Session connected',
+      'ManageChannelsSession connected',
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
     ]);
     expect(errorMessages).to.deep.equal([]);

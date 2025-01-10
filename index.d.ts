@@ -209,6 +209,23 @@ export class MultiProvider extends EventEmitter {
   send(notification: Notification, recipients: string|string[]): Promise<Responses<ResponseSent,ResponseFailure>>;
 
   /**
+   * Manage channels using a specific action.
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId - The bundleId for your application.
+   * @param action - Specifies the action to perform on the channel(s).
+   */
+  manageChannels(notifications: Notification|Notification[], bundleId: string, action: ChannelAction): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
+
+  /**
+   * Broadcast notificaitons to channel(s).
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId: The bundleId for your application.
+   */
+  broadcast(notifications: Notification|Notification[], bundleId: string): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
+
+  /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
    * @remarks

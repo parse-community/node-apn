@@ -1228,13 +1228,13 @@ describe('ManageChannelsClient', () => {
   // but that's not the most important point of these tests)
   const createClient = (port, timeout = 500) => {
     const c = new Client({
-      port: TEST_PORT,
-      address: '127.0.0.1',
+      manageChannelsAddress: '127.0.0.1',
+      manageChannelsPort: TEST_PORT,
     });
     c._mockOverrideUrl = `http://127.0.0.1:${port}`;
-    c.config.port = port;
-    c.config.address = '127.0.0.1';
     c.config.requestTimeout = timeout;
+    c.manageChannelsAddress = '127.0.0.1';
+    c.manageChannelsPort = TEST_PORT;
     return c;
   };
   // Create an insecure server for unit testing.
@@ -1444,7 +1444,7 @@ describe('ManageChannelsClient', () => {
     await runRequestWithBadDeviceToken();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(infoMessages).to.deep.equal([
-      'Session connected',
+      'ManageChannelsSession connected',
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
     ]);
@@ -1688,7 +1688,7 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(3);
   });
 
-  it('Throws error on unknown action type', async () => {
+  it('Throws error if a path cannot be generated from type', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     const responseTimeout = 0;
@@ -1723,7 +1723,7 @@ describe('ManageChannelsClient', () => {
       }
       expect(receivedError).to.exist;
       expect(receivedError.error).to.be.an.instanceof(VError);
-      expect(receivedError.error.message).to.have.string('not supported');
+      expect(receivedError.error.message).to.have.string('could not make a path');
     };
     await performRequestExpectingDisconnect();
     expect(didGetRequest).to.be.false;
@@ -1767,6 +1767,50 @@ describe('ManageChannelsClient', () => {
       expect(receivedError.bundleId).to.equal(bundleId);
       expect(receivedError.error).to.be.an.instanceof(VError);
       expect(receivedError.error.message).to.have.string('invalid httpMethod');
+    };
+    await performRequestExpectingDisconnect();
+    expect(didGetRequest).to.be.false;
+    expect(establishedConnections).to.equal(0);
+  });
+
+  it('Throws error if attempted to write after shutdown', async () => {
+    let didGetRequest = false;
+    let establishedConnections = 0;
+    const responseTimeout = 0;
+    server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
+      setTimeout(() => {
+        const { session } = stream;
+        didGetRequest = true;
+        if (session) {
+          session.destroy();
+        }
+      }, responseTimeout);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    client = createClient(TEST_PORT);
+
+    const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
+    await onListeningPromise;
+
+    const mockHeaders = { 'apns-someheader': 'somevalue' };
+    const mockNotification = {
+      headers: mockHeaders,
+      body: MOCK_BODY,
+    };
+    const performRequestExpectingDisconnect = async () => {
+      const bundleId = BUNDLE_ID;
+      const method = 'post';
+      let receivedError;
+      client.shutdown();
+      try {
+        await client.write(mockNotification, bundleId, 'channels', method);
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.bundleId).to.equal(bundleId);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('client is destroyed');
     };
     await performRequestExpectingDisconnect();
     expect(didGetRequest).to.be.false;
