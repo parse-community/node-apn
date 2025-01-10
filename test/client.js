@@ -65,9 +65,9 @@ describe('Client', () => {
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
   const MOCK_DEVICE_TOKEN = 'abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123';
-  // const BUNDLE_ID = 'com.node.apn';
+  const BUNDLE_ID = 'com.node.apn';
   const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`;
-  // const PATH_BROADCASTS = `/4/broadcasts/apps/${BUNDLE_ID}`;
+  const PATH_BROADCASTS = `/4/broadcasts/apps/${BUNDLE_ID}`;
 
   // Create an insecure http2 client for unit testing.
   // (APNS would use https://, not http://)
@@ -130,7 +130,7 @@ describe('Client', () => {
     }
   });
 
-  it('Treats HTTP 200 responses as successful', async () => {
+  it('Treats HTTP 200 responses as successful for device', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
@@ -166,6 +166,60 @@ describe('Client', () => {
       const device = MOCK_DEVICE_TOKEN;
       const result = await client.write(mockNotification, device, 'device', 'post');
       expect(result).to.deep.equal({ device });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
+  });
+
+  it('Treats HTTP 200 responses as successful for broadcasts', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_BROADCASTS;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'broadcasts', 'post');
+      expect(result).to.deep.equal({ bundleId });
       expect(didRequest).to.be.true;
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
@@ -1221,6 +1275,7 @@ describe('ManageChannelsClient', () => {
   const MOCK_BODY = '{"mock-key":"mock-value"}';
   const BUNDLE_ID = 'com.node.apn';
   const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
+  const PATH_ALL_CHANNELS = `/1/apps/${BUNDLE_ID}/all-channels`;
 
   // Create an insecure http2 client for unit testing.
   // (APNS would use https://, not http://)
@@ -1283,7 +1338,7 @@ describe('ManageChannelsClient', () => {
     }
   });
 
-  it('Treats HTTP 200 responses as successful', async () => {
+  it('Treats HTTP 200 responses as successful for channels', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
@@ -1318,6 +1373,60 @@ describe('ManageChannelsClient', () => {
       };
       const bundleId = BUNDLE_ID;
       const result = await client.write(mockNotification, bundleId, 'channels', 'post');
+      expect(result).to.deep.equal({ bundleId });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
+  });
+
+  it('Treats HTTP 200 responses as successful for allChannels', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_ALL_CHANNELS;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'allChannels', 'post');
       expect(result).to.deep.equal({ bundleId });
       expect(didRequest).to.be.true;
     };

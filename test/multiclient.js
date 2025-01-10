@@ -69,11 +69,7 @@ describe('MultiClient', () => {
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
   const MOCK_DEVICE_TOKEN = 'abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123abcf0123';
-  // const BUNDLE_ID = 'com.node.apn';
-  // const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
-  // const PATH_CHANNELS_ALL = `/1/apps/${BUNDLE_ID}/all-channels`;
   const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`;
-  // const PATH_BROADCAST = `/4/broadcasts/apps/${BUNDLE_ID}`;
 
   // Create an insecure http2 client for unit testing.
   // (APNS would use https://, not http://)
@@ -1168,11 +1164,6 @@ describe('ManageChannelsMultiClient', () => {
   let server;
   let client;
   const MOCK_BODY = '{"mock-key":"mock-value"}';
-  // const BUNDLE_ID = 'com.node.apn';
-  // const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
-  // const PATH_CHANNELS_ALL = `/1/apps/${BUNDLE_ID}/all-channels`;
-  // const PATH_DEVICE = `/3/device/${MOCK_DEVICE_TOKEN}`;
-  // const PATH_BROADCAST = `/4/broadcasts/apps/${BUNDLE_ID}`;
   const BUNDLE_ID = 'com.node.apn';
   const PATH_CHANNELS = `/1/apps/${BUNDLE_ID}/channels`;
 
