@@ -73,15 +73,14 @@ describe('Client', () => {
   // (APNS would use https://, not http://)
   // (It's probably possible to allow accepting invalid certificates instead,
   // but that's not the most important point of these tests)
-  const createClient = (port, timeout = 500) => {
+  const createClient = (port, timeout = 500, heartBeat = 6000) => {
     const c = new Client({
       port: TEST_PORT,
       address: '127.0.0.1',
+      heartBeat: heartBeat,
+      requestTimeout: timeout,
     });
     c._mockOverrideUrl = `http://127.0.0.1:${port}`;
-    c.config.port = port;
-    c.config.address = '127.0.0.1';
-    c.config.requestTimeout = timeout;
     return c;
   };
   // Create an insecure server for unit testing.
@@ -289,6 +288,66 @@ describe('Client', () => {
     expect(requestsServed).to.equal(LOAD_TEST_BATCH_SIZE);
   });
 
+  it('Log pings for session', async () => {
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_DEVICE;
+    const pingDelay = 50;
+    const responseDelay = pingDelay * 2;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // Set a timeout of responseDelay to simulate latency to a remote server.
+      setTimeout(() => {
+        res.writeHead(200);
+        res.end('');
+        requestsServed += 1;
+      }, responseDelay);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT, 500, pingDelay);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result).to.deep.equal({ device });
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(1);
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('Ping response')).to.be.true;
+    expect(errorMessages).to.be.empty;
+  });
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
@@ -350,6 +409,53 @@ describe('Client', () => {
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
     ]);
     expect(errorMessages).to.deep.equal([]);
+  });
+
+  it('Closes Session when no session is passed to destroySession', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_DEVICE;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const device = MOCK_DEVICE_TOKEN;
+      const result = await client.write(mockNotification, device, 'device', 'post');
+      expect(result).to.deep.equal({ device });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(1);
+    expect(client.session).to.exist;
+    client.destroySession();
+    expect(client.session).to.not.exist;
   });
 
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
@@ -1281,15 +1387,14 @@ describe('ManageChannelsClient', () => {
   // (APNS would use https://, not http://)
   // (It's probably possible to allow accepting invalid certificates instead,
   // but that's not the most important point of these tests)
-  const createClient = (port, timeout = 500) => {
+  const createClient = (port, timeout = 500, heartBeat = 6000) => {
     const c = new Client({
       manageChannelsAddress: '127.0.0.1',
       manageChannelsPort: TEST_PORT,
+      heartBeat: heartBeat,
+      requestTimeout: timeout,
     });
     c._mockOverrideUrl = `http://127.0.0.1:${port}`;
-    c.config.requestTimeout = timeout;
-    c.manageChannelsAddress = '127.0.0.1';
-    c.manageChannelsPort = TEST_PORT;
     return c;
   };
   // Create an insecure server for unit testing.
@@ -1497,6 +1602,66 @@ describe('ManageChannelsClient', () => {
     expect(requestsServed).to.equal(LOAD_TEST_BATCH_SIZE);
   });
 
+  it('Log pings for session', async () => {
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_CHANNELS;
+    const pingDelay = 50;
+    const responseDelay = pingDelay * 2;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // Set a timeout of responseDelay to simulate latency to a remote server.
+      setTimeout(() => {
+        res.writeHead(200);
+        res.end('');
+        requestsServed += 1;
+      }, responseDelay);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT, 500, pingDelay);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'channels', 'post');
+      expect(result).to.deep.equal({ bundleId });
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(1);
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('ManageChannelsSession Ping response')).to.be.true;
+    expect(errorMessages).to.be.empty;
+  });
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
@@ -1560,11 +1725,9 @@ describe('ManageChannelsClient', () => {
     expect(errorMessages).to.deep.equal([]);
   });
 
-  // node-apn started closing connections in response to a bug report where HTTP 500 responses
-  // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
-    let responseDelay = 50;
+    const responseDelay = 50;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       // Wait 50ms before sending the responses in parallel
       setTimeout(() => {
@@ -1602,7 +1765,104 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(3); // should close and establish new connections on http 500
     // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
     // (no segfaults, all promises get resolved, etc.)
-    responseDelay = 50;
+    await Promise.all([
+      runRequestWithInternalServerError(),
+      runRequestWithInternalServerError(),
+      runRequestWithInternalServerError(),
+      runRequestWithInternalServerError(),
+    ]);
+    expect(establishedConnections).to.equal(4); // should close and establish new connections on http 500
+  });
+
+  it('Closes ManageChannelsSession when no session is passed to destroyManageChannelsSession', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_CHANNELS;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'channels', 'post');
+      expect(result).to.deep.equal({ bundleId });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(1);
+    expect(client.manageChannelsSession).to.exist;
+    client.destroyManageChannelsSession();
+    expect(client.manageChannelsSession).to.not.exist;
+  });
+
+  // node-apn started closing connections in response to a bug report where HTTP 500 responses
+  // persisted until a new connection was reopened
+  it('Closes connections when HTTP 500 responses are received', async () => {
+    let establishedConnections = 0;
+    const responseDelay = 50;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      // Wait 50ms before sending the responses in parallel
+      setTimeout(() => {
+        expect(requestBody).to.equal(MOCK_BODY);
+        res.writeHead(500);
+        res.end('{"reason": "InternalServerError"}');
+      }, responseDelay);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    const runRequestWithInternalServerError = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      let receivedError;
+      try {
+        await client.write(mockNotification, bundleId, 'channels', 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.bundleId).to.equal(bundleId);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('stream ended unexpectedly');
+    };
+    await runRequestWithInternalServerError();
+    await runRequestWithInternalServerError();
+    await runRequestWithInternalServerError();
+    expect(establishedConnections).to.equal(3); // should close and establish new connections on http 500
+    // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
+    // (no segfaults, all promises get resolved, etc.)
     await Promise.all([
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
