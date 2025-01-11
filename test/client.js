@@ -614,6 +614,19 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     client = createClient(TEST_PORT);
 
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
 
@@ -639,6 +652,10 @@ describe('Client', () => {
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
     expect(establishedConnections).to.equal(2);
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[0].includes('GOAWAY')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('Session connected')).to.be.true;
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
@@ -656,6 +673,19 @@ describe('Client', () => {
     });
     server.on('connection', () => (establishedConnections += 1));
     client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -693,6 +723,10 @@ describe('Client', () => {
       performRequestExpectingDisconnect(),
     ]);
     expect(establishedConnections).to.equal(3);
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[0].includes('GOAWAY')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('status null')).to.be.true;
   });
 
   it('Establishes a connection through a proxy server', async () => {
@@ -1741,6 +1775,19 @@ describe('ManageChannelsClient', () => {
 
     client = createClient(TEST_PORT);
 
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -1772,6 +1819,10 @@ describe('ManageChannelsClient', () => {
       runRequestWithInternalServerError(),
     ]);
     expect(establishedConnections).to.equal(4); // should close and establish new connections on http 500
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[1].includes('Session closed')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('status 500')).to.be.true;
   });
 
   it('Closes ManageChannelsSession when no session is passed to destroyManageChannelsSession', async () => {
@@ -1821,57 +1872,6 @@ describe('ManageChannelsClient', () => {
     expect(client.manageChannelsSession).to.not.exist;
   });
 
-  // node-apn started closing connections in response to a bug report where HTTP 500 responses
-  // persisted until a new connection was reopened
-  it('Closes connections when HTTP 500 responses are received', async () => {
-    let establishedConnections = 0;
-    const responseDelay = 50;
-    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
-      // Wait 50ms before sending the responses in parallel
-      setTimeout(() => {
-        expect(requestBody).to.equal(MOCK_BODY);
-        res.writeHead(500);
-        res.end('{"reason": "InternalServerError"}');
-      }, responseDelay);
-    });
-    server.on('connection', () => (establishedConnections += 1));
-    await new Promise(resolve => server.on('listening', resolve));
-
-    client = createClient(TEST_PORT);
-
-    const runRequestWithInternalServerError = async () => {
-      const mockHeaders = { 'apns-someheader': 'somevalue' };
-      const mockNotification = {
-        headers: mockHeaders,
-        body: MOCK_BODY,
-      };
-      const bundleId = BUNDLE_ID;
-      let receivedError;
-      try {
-        await client.write(mockNotification, bundleId, 'channels', 'post');
-      } catch (e) {
-        receivedError = e;
-      }
-      expect(receivedError).to.exist;
-      expect(receivedError.bundleId).to.equal(bundleId);
-      expect(receivedError.error).to.be.an.instanceof(VError);
-      expect(receivedError.error.message).to.have.string('stream ended unexpectedly');
-    };
-    await runRequestWithInternalServerError();
-    await runRequestWithInternalServerError();
-    await runRequestWithInternalServerError();
-    expect(establishedConnections).to.equal(3); // should close and establish new connections on http 500
-    // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
-    // (no segfaults, all promises get resolved, etc.)
-    await Promise.all([
-      runRequestWithInternalServerError(),
-      runRequestWithInternalServerError(),
-      runRequestWithInternalServerError(),
-      runRequestWithInternalServerError(),
-    ]);
-    expect(establishedConnections).to.equal(4); // should close and establish new connections on http 500
-  });
-
   it('Handles unexpected invalid JSON responses', async () => {
     let establishedConnections = 0;
     const responseDelay = 0;
@@ -1887,6 +1887,19 @@ describe('ManageChannelsClient', () => {
     await new Promise(resolve => server.on('listening', resolve));
 
     client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1913,6 +1926,10 @@ describe('ManageChannelsClient', () => {
     await runRequestWithInternalServerError();
     await runRequestWithInternalServerError();
     expect(establishedConnections).to.equal(1); // Currently reuses the connection.
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[1].includes('processing APNs')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('status 500')).to.be.true;
   });
 
   it('Handles APNs timeouts', async () => {
@@ -1927,6 +1944,19 @@ describe('ManageChannelsClient', () => {
       }, 1900);
     });
     client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -1962,6 +1992,10 @@ describe('ManageChannelsClient', () => {
       performRequestExpectingTimeout(),
       performRequestExpectingTimeout(),
     ]);
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[1].includes('Request timeout')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('timeout')).to.be.true;
   });
 
   it('Handles goaway frames', async () => {
@@ -1975,6 +2009,19 @@ describe('ManageChannelsClient', () => {
     });
     server.on('connection', () => (establishedConnections += 1));
     client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -2001,6 +2048,10 @@ describe('ManageChannelsClient', () => {
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
     expect(establishedConnections).to.equal(2);
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[0].includes('ManageChannelsSession GOAWAY')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('ManageChannelsSession connected')).to.be.true;
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
@@ -2018,6 +2069,19 @@ describe('ManageChannelsClient', () => {
     });
     server.on('connection', () => (establishedConnections += 1));
     client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -2055,6 +2119,10 @@ describe('ManageChannelsClient', () => {
       performRequestExpectingDisconnect(),
     ]);
     expect(establishedConnections).to.equal(3);
+    expect(errorMessages).to.not.be.empty;
+    expect(errorMessages[0].includes('ManageChannelsSession GOAWAY')).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    expect(infoMessages[1].includes('status null')).to.be.true;
   });
 
   it('Throws error if a path cannot be generated from type', async () => {
@@ -2259,8 +2327,4 @@ describe('ManageChannelsClient', () => {
 
     proxy.close();
   });
-
-  describe('write', () => {});
-
-  describe('shutdown', () => {});
 });
