@@ -655,7 +655,7 @@ describe('Client', () => {
     expect(errorMessages).to.not.be.empty;
     expect(errorMessages[0].includes('GOAWAY')).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('Session connected')).to.be.true;
+    expect(infoMessages[1]).to.equal('Session connected');
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
@@ -2051,7 +2051,7 @@ describe('ManageChannelsClient', () => {
     expect(errorMessages).to.not.be.empty;
     expect(errorMessages[0].includes('ManageChannelsSession GOAWAY')).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('ManageChannelsSession connected')).to.be.true;
+    expect(infoMessages[1]).to.be.equal('ManageChannelsSession connected');
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
