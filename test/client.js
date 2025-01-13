@@ -723,7 +723,7 @@ describe('Client', () => {
     });
     await new Promise(resolve => proxy.listen(proxyPort, resolve));
     // Don't block the tests if this server doesn't shut down properly
-    proxy.unref();
+    // proxy.unref();
 
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
@@ -2242,7 +2242,7 @@ describe('ManageChannelsClient', () => {
     });
     await new Promise(resolve => proxy.listen(proxyPort, resolve));
     // Don't block the tests if this server doesn't shut down properly
-    proxy.unref();
+    // proxy.unref();
 
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
