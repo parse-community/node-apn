@@ -740,7 +740,7 @@ describe('Client', () => {
 
     // Proxy forwards all connections to TEST_PORT
     const sockets = [];
-    const proxy = net.createServer(clientSocket => {
+    let proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
         const serverSocket = net.createConnection(TEST_PORT, () => {
           clientSocket.write('HTTP/1.1 200 OK\r\n\r\n');
@@ -2313,7 +2313,7 @@ describe('ManageChannelsClient', () => {
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
     const path = PATH_CHANNELS;
-    const proxyPort = TEST_PORT - 1;
+    let proxyPort = TEST_PORT - 1;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
