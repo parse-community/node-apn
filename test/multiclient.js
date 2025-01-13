@@ -119,20 +119,22 @@ describe('MultiClient', () => {
     return server;
   };
 
-  afterEach(done => {
-    const closeServer = () => {
+  afterEach(async () => {
+    const closeServer = async () => {
       if (server) {
-        server.close();
+        await new Promise((resolve) => {
+          server.close(() => {
+            resolve();
+          });
+        });
         server = null;
       }
-      done();
     };
     if (client) {
-      client.shutdown(closeServer);
+      await client.shutdown(closeServer);
       client = null;
-    } else {
-      closeServer();
     }
+    await closeServer();
   });
 
   it('rejects invalid clientCount', () => {
@@ -1215,20 +1217,22 @@ describe('ManageChannelsMultiClient', () => {
     return server;
   };
 
-  afterEach(done => {
-    const closeServer = () => {
+  afterEach(async () => {
+    const closeServer = async () => {
       if (server) {
-        server.close();
+        await new Promise((resolve) => {
+          server.close(() => {
+            resolve();
+          });
+        });
         server = null;
       }
-      done();
     };
     if (client) {
-      client.shutdown(closeServer);
+      await client.shutdown();
       client = null;
-    } else {
-      closeServer();
     }
+    await closeServer();
   });
 
   it('rejects invalid clientCount', () => {

@@ -3,9 +3,7 @@ const net = require('net');
 const http2 = require('http2');
 
 const {
-  HTTP2_METHOD_POST,
-  // HTTP2_METHOD_GET,
-  // HTTP2_METHOD_DELETE
+  HTTP2_METHOD_POST
 } = http2.constants;
 
 const debug = require('debug')('apn');
@@ -113,20 +111,22 @@ describe('Client', () => {
     return server;
   };
 
-  afterEach(done => {
-    const closeServer = () => {
+  afterEach(async () => {
+    const closeServer = async () => {
       if (server) {
-        server.close();
+        await new Promise((resolve) => {
+          server.close(() => {
+            resolve();
+          });
+        });
         server = null;
       }
-      done();
     };
     if (client) {
-      client.shutdown(closeServer);
+      await client.shutdown();
       client = null;
-    } else {
-      closeServer();
     }
+    await closeServer();
   });
 
   it('Treats HTTP 200 responses as successful for device', async () => {
@@ -411,53 +411,6 @@ describe('Client', () => {
     expect(errorMessages).to.deep.equal([]);
   });
 
-  it('Closes Session when no session is passed to destroySession', async () => {
-    let didRequest = false;
-    let establishedConnections = 0;
-    let requestsServed = 0;
-    const method = HTTP2_METHOD_POST;
-    const path = PATH_DEVICE;
-    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
-      expect(req.headers).to.deep.equal({
-        ':authority': '127.0.0.1',
-        ':method': method,
-        ':path': path,
-        ':scheme': 'https',
-        'apns-someheader': 'somevalue',
-      });
-      expect(requestBody).to.equal(MOCK_BODY);
-      // res.setHeader('X-Foo', 'bar');
-      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.writeHead(200);
-      res.end('');
-      requestsServed += 1;
-      didRequest = true;
-    });
-    server.on('connection', () => (establishedConnections += 1));
-    await new Promise(resolve => server.on('listening', resolve));
-
-    client = createClient(TEST_PORT);
-
-    const runSuccessfulRequest = async () => {
-      const mockHeaders = { 'apns-someheader': 'somevalue' };
-      const mockNotification = {
-        headers: mockHeaders,
-        body: MOCK_BODY,
-      };
-      const device = MOCK_DEVICE_TOKEN;
-      const result = await client.write(mockNotification, device, 'device', 'post');
-      expect(result).to.deep.equal({ device });
-      expect(didRequest).to.be.true;
-    };
-    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
-    await runSuccessfulRequest();
-    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
-    expect(requestsServed).to.equal(1);
-    expect(client.session).to.exist;
-    client.destroySession();
-    expect(client.session).to.not.exist;
-  });
-
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -734,6 +687,7 @@ describe('Client', () => {
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
     const path = PATH_DEVICE;
+    const proxyPort = TEST_PORT - 1;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -755,6 +709,7 @@ describe('Client', () => {
     await new Promise(resolve => server.once('listening', resolve));
 
     // Proxy forwards all connections to TEST_PORT
+    const sockets = [];
     const proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
         const serverSocket = net.createConnection(TEST_PORT, () => {
@@ -764,15 +719,18 @@ describe('Client', () => {
             serverSocket.pipe(clientSocket);
           }, 1);
         });
+        sockets.push(clientSocket, serverSocket);
       });
       clientSocket.on('error', () => {});
     });
-    await new Promise(resolve => proxy.listen(3128, resolve));
+    await new Promise(resolve => proxy.listen(proxyPort, resolve));
+    // Don't block the tests if this server doesn't shut down properly
+    proxy.unref();
 
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
     // So without adding a proxy config request will fail with a network error
-    client.config.proxy = { host: '127.0.0.1', port: 3128 };
+    client.config.proxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -799,7 +757,46 @@ describe('Client', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
 
-    proxy.close();
+    // Shut down proxy server properly
+    await new Promise((resolve) => {
+      sockets.forEach((socket) => socket.end(''));
+      proxy.close(() => {
+        resolve();
+      });
+    });
+  });
+
+  it('Throws an error when there is a bad proxy server', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+
+    // Client configured with a port that the server is not listening on
+    client = createClient(TEST_PORT);
+    // So without adding a proxy config request will fail with a network error
+    client.config.proxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
+    const runUnsuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const device = MOCK_DEVICE_TOKEN;
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.device).to.equal(device);
+      expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
+      expect(didRequest).to.be.false;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runUnsuccessfulRequest();
+    expect(establishedConnections).to.equal(0); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(0);
   });
 
   // let fakes, Client;
@@ -1460,20 +1457,22 @@ describe('ManageChannelsClient', () => {
     return server;
   };
 
-  afterEach(done => {
-    const closeServer = () => {
+  afterEach(async () => {
+    const closeServer = async () => {
       if (server) {
-        server.close();
+        await new Promise((resolve) => {
+          server.close(() => {
+            resolve();
+          });
+        });
         server = null;
       }
-      done();
     };
     if (client) {
-      client.shutdown(closeServer);
+      await client.shutdown();
       client = null;
-    } else {
-      closeServer();
     }
+    await closeServer();
   });
 
   it('Treats HTTP 200 responses as successful for channels', async () => {
@@ -1822,53 +1821,6 @@ describe('ManageChannelsClient', () => {
     expect(errorMessages[1].includes('Session closed')).to.be.true;
     expect(infoMessages).to.not.be.empty;
     expect(infoMessages[1].includes('status 500')).to.be.true;
-  });
-
-  it('Closes ManageChannelsSession when no session is passed to destroyManageChannelsSession', async () => {
-    let didRequest = false;
-    let establishedConnections = 0;
-    let requestsServed = 0;
-    const method = HTTP2_METHOD_POST;
-    const path = PATH_CHANNELS;
-    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
-      expect(req.headers).to.deep.equal({
-        ':authority': '127.0.0.1',
-        ':method': method,
-        ':path': path,
-        ':scheme': 'https',
-        'apns-someheader': 'somevalue',
-      });
-      expect(requestBody).to.equal(MOCK_BODY);
-      // res.setHeader('X-Foo', 'bar');
-      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.writeHead(200);
-      res.end('');
-      requestsServed += 1;
-      didRequest = true;
-    });
-    server.on('connection', () => (establishedConnections += 1));
-    await new Promise(resolve => server.on('listening', resolve));
-
-    client = createClient(TEST_PORT);
-
-    const runSuccessfulRequest = async () => {
-      const mockHeaders = { 'apns-someheader': 'somevalue' };
-      const mockNotification = {
-        headers: mockHeaders,
-        body: MOCK_BODY,
-      };
-      const bundleId = BUNDLE_ID;
-      const result = await client.write(mockNotification, bundleId, 'channels', 'post');
-      expect(result).to.deep.equal({ bundleId });
-      expect(didRequest).to.be.true;
-    };
-    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
-    await runSuccessfulRequest();
-    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
-    expect(requestsServed).to.equal(1);
-    expect(client.manageChannelsSession).to.exist;
-    client.destroyManageChannelsSession();
-    expect(client.manageChannelsSession).to.not.exist;
   });
 
   it('Handles unexpected invalid JSON responses', async () => {
@@ -2236,7 +2188,7 @@ describe('ManageChannelsClient', () => {
       const bundleId = BUNDLE_ID;
       const method = 'post';
       let receivedError;
-      client.shutdown();
+      await client.shutdown();
       try {
         await client.write(mockNotification, bundleId, 'channels', method);
       } catch (e) {
@@ -2258,6 +2210,7 @@ describe('ManageChannelsClient', () => {
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
     const path = PATH_CHANNELS;
+    const proxyPort = TEST_PORT - 1;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -2275,10 +2228,15 @@ describe('ManageChannelsClient', () => {
       requestsServed += 1;
       didRequest = true;
     });
-    server.on('connection', () => (establishedConnections += 1));
+    server.on('connection', (socket) => {
+      establishedConnections += 1
+      console.log('Socket remote address:', socket.remoteAddress);
+      console.log('Socket remote port:', socket.remotePort);
+    });
     await new Promise(resolve => server.once('listening', resolve));
 
     // Proxy forwards all connections to TEST_PORT
+    const sockets = [];
     const proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
         const serverSocket = net.createConnection(TEST_PORT, () => {
@@ -2288,15 +2246,18 @@ describe('ManageChannelsClient', () => {
             serverSocket.pipe(clientSocket);
           }, 1);
         });
+        sockets.push(clientSocket, serverSocket);
       });
       clientSocket.on('error', () => {});
     });
-    await new Promise(resolve => proxy.listen(3128, resolve));
+    await new Promise(resolve => proxy.listen(proxyPort, resolve));
+    // Don't block the tests if this server doesn't shut down properly
+    proxy.unref();
 
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
     // So without adding a proxy config request will fail with a network error
-    client.config.proxy = { host: '127.0.0.1', port: 3128 };
+    // client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -2323,6 +2284,45 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
 
-    proxy.close();
+    // Shut down proxy server properly
+    await new Promise((resolve) => {
+      sockets.forEach((socket) => socket.end(''));
+      proxy.close(() => {
+        resolve();
+      });
+    });
+  });
+
+  it('Throws an error when there is a bad proxy server', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+
+    // Client configured with a port that the server is not listening on
+    client = createClient(TEST_PORT);
+    // So without adding a proxy config request will fail with a network error
+    client.config.manageChannelsProxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
+    const runUnsuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      let receivedError;
+      try {
+        await client.write(mockNotification, bundleId, 'channels', 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.bundleId).to.equal(bundleId);
+      expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
+      expect(didRequest).to.be.false;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    await runUnsuccessfulRequest();
+    expect(establishedConnections).to.equal(0); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(0);
   });
 });
