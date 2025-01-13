@@ -2,9 +2,7 @@ const VError = require('verror');
 const net = require('net');
 const http2 = require('http2');
 
-const {
-  HTTP2_METHOD_POST
-} = http2.constants;
+const { HTTP2_METHOD_POST } = http2.constants;
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
@@ -114,7 +112,7 @@ describe('Client', () => {
   afterEach(async () => {
     const closeServer = async () => {
       if (server) {
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
           server.close(() => {
             resolve();
           });
@@ -758,8 +756,8 @@ describe('Client', () => {
     expect(requestsServed).to.equal(6);
 
     // Shut down proxy server properly
-    await new Promise((resolve) => {
-      sockets.forEach((socket) => socket.end(''));
+    await new Promise(resolve => {
+      sockets.forEach(socket => socket.end(''));
       proxy.close(() => {
         resolve();
       });
@@ -767,10 +765,6 @@ describe('Client', () => {
   });
 
   it('Throws an error when there is a bad proxy server', async () => {
-    let didRequest = false;
-    let establishedConnections = 0;
-    let requestsServed = 0;
-
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT);
     // So without adding a proxy config request will fail with a network error
@@ -791,12 +785,8 @@ describe('Client', () => {
       expect(receivedError).to.exist;
       expect(receivedError.device).to.equal(device);
       expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
-      expect(didRequest).to.be.false;
     };
-    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     await runUnsuccessfulRequest();
-    expect(establishedConnections).to.equal(0); // should establish a connection to the server and reuse it
-    expect(requestsServed).to.equal(0);
   });
 
   // let fakes, Client;
@@ -1460,7 +1450,7 @@ describe('ManageChannelsClient', () => {
   afterEach(async () => {
     const closeServer = async () => {
       if (server) {
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
           server.close(() => {
             resolve();
           });
@@ -2228,8 +2218,8 @@ describe('ManageChannelsClient', () => {
       requestsServed += 1;
       didRequest = true;
     });
-    server.on('connection', (socket) => {
-      establishedConnections += 1
+    server.on('connection', socket => {
+      establishedConnections += 1;
       console.log('Socket remote address:', socket.remoteAddress);
       console.log('Socket remote port:', socket.remotePort);
     });
@@ -2285,8 +2275,8 @@ describe('ManageChannelsClient', () => {
     expect(requestsServed).to.equal(6);
 
     // Shut down proxy server properly
-    await new Promise((resolve) => {
-      sockets.forEach((socket) => socket.end(''));
+    await new Promise(resolve => {
+      sockets.forEach(socket => socket.end(''));
       proxy.close(() => {
         resolve();
       });
@@ -2294,10 +2284,6 @@ describe('ManageChannelsClient', () => {
   });
 
   it('Throws an error when there is a bad proxy server', async () => {
-    let didRequest = false;
-    let establishedConnections = 0;
-    let requestsServed = 0;
-
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT);
     // So without adding a proxy config request will fail with a network error
@@ -2318,11 +2304,7 @@ describe('ManageChannelsClient', () => {
       expect(receivedError).to.exist;
       expect(receivedError.bundleId).to.equal(bundleId);
       expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
-      expect(didRequest).to.be.false;
     };
-    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     await runUnsuccessfulRequest();
-    expect(establishedConnections).to.equal(0); // should establish a connection to the server and reuse it
-    expect(requestsServed).to.equal(0);
   });
 });

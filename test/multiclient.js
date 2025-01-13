@@ -122,7 +122,7 @@ describe('MultiClient', () => {
   afterEach(async () => {
     const closeServer = async () => {
       if (server) {
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
           server.close(() => {
             resolve();
           });
@@ -1220,7 +1220,7 @@ describe('ManageChannelsMultiClient', () => {
   afterEach(async () => {
     const closeServer = async () => {
       if (server) {
-        await new Promise((resolve) => {
+        await new Promise(resolve => {
           server.close(() => {
             resolve();
           });
