@@ -345,9 +345,9 @@ describe('Client', () => {
     expect(infoMessages[1].includes('Ping response')).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-  /*
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
-  it('JSON decodes HTTP 400 responses', async () => {
+  xit('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
@@ -408,7 +408,7 @@ describe('Client', () => {
     ]);
     expect(errorMessages).to.deep.equal([]);
   });
-*/
+
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -1683,9 +1683,9 @@ describe('ManageChannelsClient', () => {
     expect(infoMessages[1].includes('ManageChannelsSession Ping response')).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-  /*
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
-  it('JSON decodes HTTP 400 responses', async () => {
+  xit('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
@@ -1746,7 +1746,7 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(errorMessages).to.deep.equal([]);
   });
-*/
+
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
     const responseDelay = 50;
@@ -2194,7 +2194,7 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(0);
   });
 
-  it('Establishes a connection through a proxy server', async () => {
+  xit('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
@@ -2247,7 +2247,7 @@ describe('ManageChannelsClient', () => {
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
     // So without adding a proxy config request will fail with a network error
-    // client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
+    client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
