@@ -353,9 +353,9 @@ describe('Client', () => {
     expect(infoMessagesContainsPing).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-  /*
+  
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
-  xit('JSON decodes HTTP 400 responses', async () => {
+  it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
@@ -416,7 +416,7 @@ describe('Client', () => {
     ]);
     expect(errorMessages).to.be.empty;
   });
-*/
+
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -1723,9 +1723,9 @@ describe('ManageChannelsClient', () => {
     expect(infoMessagesContainsPing).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-  /*
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
-  xit('JSON decodes HTTP 400 responses', async () => {
+  it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
@@ -1786,7 +1786,7 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(errorMessages).to.deep.equal([]);
   });
-*/
+
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
     const responseDelay = 50;
