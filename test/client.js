@@ -353,7 +353,7 @@ describe('Client', () => {
     expect(infoMessagesContainsPing).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-  
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
