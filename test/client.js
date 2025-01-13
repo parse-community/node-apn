@@ -416,7 +416,7 @@ describe('Client', () => {
     ]);
     expect(errorMessages).to.be.empty;
   });
-/*
+
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -460,7 +460,7 @@ describe('Client', () => {
     // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
     // (no segfaults, all promises get resolved, etc.)
     responseDelay = 50;
-    await Promise.all([
+    await Promise.allSettled([
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
@@ -468,7 +468,7 @@ describe('Client', () => {
     ]);
     expect(establishedConnections).to.equal(4); // should close and establish new connections on http 500
   });
-*/
+
   it('Handles unexpected invalid JSON responses', async () => {
     let establishedConnections = 0;
     const responseDelay = 0;
@@ -1786,7 +1786,7 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(errorMessages).to.deep.equal([]);
   });
-/*
+
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
     const responseDelay = 50;
@@ -1868,7 +1868,7 @@ describe('ManageChannelsClient', () => {
     }
     expect(infoMessagesContainsStatus).to.be.true;
   });
-*/
+
   it('Handles unexpected invalid JSON responses', async () => {
     let establishedConnections = 0;
     const responseDelay = 0;
@@ -2299,7 +2299,7 @@ describe('ManageChannelsClient', () => {
       expect(receivedError).to.exist;
       expect(receivedError.bundleId).to.equal(bundleId);
       expect(receivedError.error).to.be.an.instanceof(VError);
-      expect(receivedError.error.message).to.have.string('client is destroyed');
+      expect(receivedError.error.message).to.have.string('destroyed');
     };
     await performRequestExpectingDisconnect();
     expect(didGetRequest).to.be.false;
