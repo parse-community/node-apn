@@ -342,10 +342,18 @@ describe('Client', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(1);
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('Ping response')).to.be.true;
+    let infoMessagesContainsPing = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('Ping response')) {
+        infoMessagesContainsPing = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsPing).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-
+  /*
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   xit('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
@@ -406,9 +414,9 @@ describe('Client', () => {
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
       'Request ended with status 400 and responseData: {"reason": "BadDeviceToken"}',
     ]);
-    expect(errorMessages).to.deep.equal([]);
+    expect(errorMessages).to.be.empty;
   });
-
+*/
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -604,7 +612,15 @@ describe('Client', () => {
     await performRequestExpectingGoAway();
     expect(establishedConnections).to.equal(2);
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[0].includes('GOAWAY')).to.be.true;
+    let errorMessagesContainsGoAway = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('GOAWAY')) {
+        errorMessagesContainsGoAway = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsGoAway).to.be.true;
     expect(infoMessages).to.not.be.empty;
   });
 
@@ -674,9 +690,25 @@ describe('Client', () => {
     ]);
     expect(establishedConnections).to.equal(3);
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[0].includes('GOAWAY')).to.be.true;
+    let errorMessagesContainsGoAway = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('GOAWAY')) {
+        errorMessagesContainsGoAway = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsGoAway).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('status null')).to.be.true;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status null')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
   });
 
   it('Establishes a connection through a proxy server', async () => {
@@ -1680,10 +1712,18 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(1);
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('ManageChannelsSession Ping response')).to.be.true;
+    let infoMessagesContainsPing = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('ManageChannelsSession Ping response')) {
+        infoMessagesContainsPing = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsPing).to.be.true;
     expect(errorMessages).to.be.empty;
   });
-
+  /*
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   xit('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
@@ -1746,7 +1786,7 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(errorMessages).to.deep.equal([]);
   });
-
+*/
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
     const responseDelay = 50;
@@ -1808,9 +1848,25 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(establishedConnections).to.equal(4); // should close and establish new connections on http 500
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[1].includes('Session closed')).to.be.true;
+    let errorMessagesContainsClose = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('Session closed')) {
+        errorMessagesContainsClose = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsClose).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('status 500')).to.be.true;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status 500')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
   });
 
   it('Handles unexpected invalid JSON responses', async () => {
@@ -1868,9 +1924,25 @@ describe('ManageChannelsClient', () => {
     await runRequestWithInternalServerError();
     expect(establishedConnections).to.equal(1); // Currently reuses the connection.
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[1].includes('processing APNs')).to.be.true;
+    let errorMessagesContainsAPNs = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('processing APNs')) {
+        errorMessagesContainsAPNs = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsAPNs).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('status 500')).to.be.true;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status 500')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
   });
 
   it('Handles APNs timeouts', async () => {
@@ -1934,9 +2006,25 @@ describe('ManageChannelsClient', () => {
       performRequestExpectingTimeout(),
     ]);
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[1].includes('Request timeout')).to.be.true;
+    let errorMessagesContainsTimeout = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('Request timeout')) {
+        errorMessagesContainsTimeout = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsTimeout).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('timeout')).to.be.true;
+    let infoMessagesContainsTimeout = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('timeout')) {
+        infoMessagesContainsTimeout = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsTimeout).to.be.true;
   });
 
   it('Handles goaway frames', async () => {
@@ -1990,7 +2078,15 @@ describe('ManageChannelsClient', () => {
     await performRequestExpectingGoAway();
     expect(establishedConnections).to.equal(2);
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[0].includes('ManageChannelsSession GOAWAY')).to.be.true;
+    let errorMessagesContainsGoAway = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('ManageChannelsSession GOAWAY')) {
+        errorMessagesContainsGoAway = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsGoAway).to.be.true;
     expect(infoMessages).to.not.be.empty;
   });
 
@@ -2060,9 +2156,25 @@ describe('ManageChannelsClient', () => {
     ]);
     expect(establishedConnections).to.equal(3);
     expect(errorMessages).to.not.be.empty;
-    expect(errorMessages[0].includes('ManageChannelsSession GOAWAY')).to.be.true;
+    let errorMessagesContainsGoAway = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('ManageChannelsSession GOAWAY')) {
+        errorMessagesContainsGoAway = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsGoAway).to.be.true;
     expect(infoMessages).to.not.be.empty;
-    expect(infoMessages[1].includes('status null')).to.be.true;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status null')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
   });
 
   it('Throws error if a path cannot be generated from type', async () => {
@@ -2193,7 +2305,7 @@ describe('ManageChannelsClient', () => {
     expect(didGetRequest).to.be.false;
     expect(establishedConnections).to.equal(0);
   });
-
+  /*
   xit('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
@@ -2282,7 +2394,7 @@ describe('ManageChannelsClient', () => {
       });
     });
   });
-
+*/
   it('Throws an error when there is a bad proxy server', async () => {
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT);
