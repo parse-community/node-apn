@@ -794,6 +794,7 @@ describe('Client', () => {
         resolve();
       });
     });
+    proxy = null;
   });
 
   it('Throws an error when there is a bad proxy server', async () => {
@@ -2393,6 +2394,7 @@ describe('ManageChannelsClient', () => {
         resolve();
       });
     });
+    proxy = null;
   });
 */
   it('Throws an error when there is a bad proxy server', async () => {
