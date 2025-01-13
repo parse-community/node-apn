@@ -362,7 +362,7 @@ describe('MultiClient', () => {
     // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
     // (no segfaults, all promises get resolved, etc.)
     responseDelay = 50;
-    await Promise.all([
+    await Promise.allSettled([
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
@@ -1460,7 +1460,7 @@ describe('ManageChannelsMultiClient', () => {
     // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
     // (no segfaults, all promises get resolved, etc.)
     responseDelay = 50;
-    await Promise.all([
+    await Promise.allSettled([
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),

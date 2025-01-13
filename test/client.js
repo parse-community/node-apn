@@ -1841,7 +1841,7 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(3); // should close and establish new connections on http 500
     // Validate that nothing wrong happens when multiple HTTP 500s are received simultaneously.
     // (no segfaults, all promises get resolved, etc.)
-    await Promise.all([
+    await Promise.allSettled([
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
       runRequestWithInternalServerError(),
