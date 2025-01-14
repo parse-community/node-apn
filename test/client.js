@@ -417,6 +417,87 @@ describe('Client', () => {
     expect(errorMessages).to.be.empty;
   });
 
+  it('Attempts to regenerate token when HTTP 403 responses are received', async () => {
+    let establishedConnections = 0;
+    const responseDelay = 50;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      // Wait 50ms before sending the responses in parallel
+      setTimeout(() => {
+        expect(requestBody).to.equal(MOCK_BODY);
+        res.writeHead(403);
+        res.end('{"reason": "ExpiredProviderToken"}');
+      }, responseDelay);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
+    const runRequestWithExpiredProviderToken = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const device = MOCK_DEVICE_TOKEN;
+      let receivedError;
+      try {
+        await client.write(mockNotification, device, 'device', 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.device).to.equal(device);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('APNs response');
+    };
+    await runRequestWithExpiredProviderToken();
+    await runRequestWithExpiredProviderToken();
+    await runRequestWithExpiredProviderToken();
+    expect(establishedConnections).to.equal(1);
+
+    await Promise.allSettled([
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+    ]);
+    expect(establishedConnections).to.equal(1); // should close and establish new connections on http 500
+    expect(errorMessages).to.not.be.empty;
+    let errorMessagesContainsAPN = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('APNs response')) {
+        errorMessagesContainsAPN = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsAPN).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status 403')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
+  });
+
   // node-apn started closing connections in response to a bug report where HTTP 500 responses
   // persisted until a new connection was reopened
   it('Closes connections when HTTP 500 responses are received', async () => {
@@ -802,6 +883,20 @@ describe('Client', () => {
     client = createClient(TEST_PORT);
     // So without adding a proxy config request will fail with a network error
     client.config.proxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
     const runUnsuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -820,6 +915,18 @@ describe('Client', () => {
       expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
     };
     await runUnsuccessfulRequest();
+
+    expect(errorMessages).to.not.be.empty;
+    let errorMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('NOT_A_PORT')) {
+        errorMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsStatus).to.be.true;
+    expect(infoMessages).to.be.empty;
   });
 
   // let fakes, Client;
@@ -1788,6 +1895,87 @@ describe('ManageChannelsClient', () => {
     expect(errorMessages).to.deep.equal([]);
   });
 
+  it('Attempts to regenerate token when HTTP 403 responses are received', async () => {
+    let establishedConnections = 0;
+    const responseDelay = 50;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      // Wait 50ms before sending the responses in parallel
+      setTimeout(() => {
+        expect(requestBody).to.equal(MOCK_BODY);
+        res.writeHead(403);
+        res.end('{"reason": "ExpiredProviderToken"}');
+      }, responseDelay);
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(TEST_PORT);
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
+    const runRequestWithExpiredProviderToken = async () => {
+      const mockHeaders = { 'apns-someheader': 'somevalue' };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: MOCK_BODY,
+      };
+      const bundleId = BUNDLE_ID;
+      let receivedError;
+      try {
+        await client.write(mockNotification, bundleId, 'channels', 'post');
+      } catch (e) {
+        receivedError = e;
+      }
+      expect(receivedError).to.exist;
+      expect(receivedError.bundleId).to.equal(bundleId);
+      expect(receivedError.error).to.be.an.instanceof(VError);
+      expect(receivedError.error.message).to.have.string('APNs response');
+    };
+    await runRequestWithExpiredProviderToken();
+    await runRequestWithExpiredProviderToken();
+    await runRequestWithExpiredProviderToken();
+    expect(establishedConnections).to.equal(1);
+
+    await Promise.allSettled([
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+      runRequestWithExpiredProviderToken(),
+    ]);
+    expect(establishedConnections).to.equal(1); // should close and establish new connections on http 500
+    expect(errorMessages).to.not.be.empty;
+    let errorMessagesContainsAPN = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('APNs response')) {
+        errorMessagesContainsAPN = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsAPN).to.be.true;
+    expect(infoMessages).to.not.be.empty;
+    let infoMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of infoMessages) {
+      if (message.includes('status 403')) {
+        infoMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(infoMessagesContainsStatus).to.be.true;
+  });
+
   it('Closes connections when HTTP 500 responses are received', async () => {
     let establishedConnections = 0;
     const responseDelay = 50;
@@ -2306,14 +2494,14 @@ describe('ManageChannelsClient', () => {
     expect(didGetRequest).to.be.false;
     expect(establishedConnections).to.equal(0);
   });
-  /*
-  xit('Establishes a connection through a proxy server', async () => {
+
+  it('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
     const path = PATH_CHANNELS;
-    let proxyPort = TEST_PORT - 1;
+    const proxyPort = TEST_PORT - 1;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -2340,7 +2528,7 @@ describe('ManageChannelsClient', () => {
 
     // Proxy forwards all connections to TEST_PORT
     const sockets = [];
-    const proxy = net.createServer(clientSocket => {
+    let proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
         const serverSocket = net.createConnection(TEST_PORT, () => {
           clientSocket.write('HTTP/1.1 200 OK\r\n\r\n');
@@ -2360,7 +2548,7 @@ describe('ManageChannelsClient', () => {
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT + 1);
     // So without adding a proxy config request will fail with a network error
-    client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
+    // client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -2396,12 +2584,26 @@ describe('ManageChannelsClient', () => {
     });
     proxy = null;
   });
-*/
+
   it('Throws an error when there is a bad proxy server', async () => {
     // Client configured with a port that the server is not listening on
     client = createClient(TEST_PORT);
     // So without adding a proxy config request will fail with a network error
     client.config.manageChannelsProxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
+
+    // Setup logger.
+    const infoMessages = [];
+    const errorMessages = [];
+    const mockInfoLogger = message => {
+      infoMessages.push(message);
+    };
+    const mockErrorLogger = message => {
+      errorMessages.push(message);
+    };
+    mockInfoLogger.enabled = true;
+    mockErrorLogger.enabled = true;
+    client.setLogger(mockInfoLogger, mockErrorLogger);
+
     const runUnsuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -2420,5 +2622,17 @@ describe('ManageChannelsClient', () => {
       expect(receivedError.error.code).to.equal('ERR_SOCKET_BAD_PORT');
     };
     await runUnsuccessfulRequest();
+
+    expect(errorMessages).to.not.be.empty;
+    let errorMessagesContainsStatus = false;
+    // Search for message, in older node, may be in random order.
+    for (const message of errorMessages) {
+      if (message.includes('NOT_A_PORT')) {
+        errorMessagesContainsStatus = true;
+        break;
+      }
+    }
+    expect(errorMessagesContainsStatus).to.be.true;
+    expect(infoMessages).to.be.empty;
   });
 });
