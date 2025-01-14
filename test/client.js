@@ -820,7 +820,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.once('listening', resolve));
 
-    // Proxy forwards all connections to TEST_PORT
+    // Proxy forwards all connections to TEST_PORT.
     const sockets = [];
     let proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
@@ -836,12 +836,12 @@ describe('Client', () => {
       clientSocket.on('error', () => {});
     });
     await new Promise(resolve => proxy.listen(proxyPort, resolve));
-    // Don't block the tests if this server doesn't shut down properly
+    // Don't block the tests if this server doesn't shut down properly.
     proxy.unref();
 
-    // Client configured with a port that the server is not listening on
+    // Client configured with a port that the server is not listening on.
     client = createClient(CLIENT_TEST_PORT);
-    // So without adding a proxy config request will fail with a network error
+    // Not adding a proxy config will cause a failure with a network error.
     client.config.proxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -856,7 +856,7 @@ describe('Client', () => {
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     // Validate that when multiple valid requests arrive concurrently,
-    // only one HTTP/2 connection gets established
+    // only one HTTP/2 connection gets established.
     await Promise.all([
       runSuccessfulRequest(),
       runSuccessfulRequest(),
@@ -869,7 +869,7 @@ describe('Client', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
 
-    // Shut down proxy server properly
+    // Shut down proxy server properly.
     await new Promise(resolve => {
       sockets.forEach(socket => socket.end(''));
       proxy.close(() => {
@@ -880,9 +880,9 @@ describe('Client', () => {
   });
 
   it('Throws an error when there is a bad proxy server', async () => {
-    // Client configured with a port that the server is not listening on
+    // Client configured with a port that the server is not listening on.
     client = createClient(CLIENT_TEST_PORT);
-    // So without adding a proxy config request will fail with a network error
+    // Not adding a proxy config will cause a failure with a network error.
     client.config.proxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
 
     // Setup logger.
@@ -2528,7 +2528,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.once('listening', resolve));
 
-    // Proxy forwards all connections to TEST_PORT
+    // Proxy forwards all connections to TEST_PORT.
     const sockets = [];
     let proxy = net.createServer(clientSocket => {
       clientSocket.once('data', () => {
@@ -2544,12 +2544,12 @@ describe('ManageChannelsClient', () => {
       clientSocket.on('error', () => {});
     });
     await new Promise(resolve => proxy.listen(proxyPort, resolve));
-    // Don't block the tests if this server doesn't shut down properly
+    // Don't block the tests if this server doesn't shut down properly.
     proxy.unref();
 
-    // Client configured with a port that the server is not listening on
+    // Client configured with a port that the server is not listening on.
     client = createClient(CLIENT_TEST_PORT);
-    // So without adding a proxy config request will fail with a network error
+    // Not adding a proxy config will cause a failure with a network error.
     client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -2564,7 +2564,7 @@ describe('ManageChannelsClient', () => {
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
     // Validate that when multiple valid requests arrive concurrently,
-    // only one HTTP/2 connection gets established
+    // only one HTTP/2 connection gets established.
     await Promise.all([
       runSuccessfulRequest(),
       runSuccessfulRequest(),
@@ -2577,7 +2577,7 @@ describe('ManageChannelsClient', () => {
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
 
-    // Shut down proxy server properly
+    // Shut down proxy server properly.
     await new Promise(resolve => {
       sockets.forEach(socket => socket.end(''));
       proxy.close(() => {
@@ -2588,9 +2588,9 @@ describe('ManageChannelsClient', () => {
   });
 
   it('Throws an error when there is a bad proxy server', async () => {
-    // Client configured with a port that the server is not listening on
+    // Client configured with a port that the server is not listening on.
     client = createClient(CLIENT_TEST_PORT);
-    // So without adding a proxy config request will fail with a network error
+    // Not adding a proxy config will cause a failure with a network error.
     client.config.manageChannelsProxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
 
     // Setup logger.
