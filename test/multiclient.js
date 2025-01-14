@@ -4,18 +4,14 @@
 const VError = require('verror');
 const http2 = require('http2');
 
-const {
-  HTTP2_METHOD_POST,
-  // HTTP2_METHOD_GET,
-  // HTTP2_METHOD_DELETE
-} = http2.constants;
+const { HTTP2_METHOD_POST } = http2.constants;
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
   logger: debug,
 });
 
-const TEST_PORT = 30939;
+const TEST_PORT = 30950;
 const CLIENT_TEST_PORT = TEST_PORT;
 const LOAD_TEST_BATCH_SIZE = 2000;
 

@@ -2500,7 +2500,7 @@ describe('ManageChannelsClient', () => {
     });
     expect(calledCallBack).to.be.true;
   });
-  /*
+
   it('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
@@ -2525,11 +2525,7 @@ describe('ManageChannelsClient', () => {
       requestsServed += 1;
       didRequest = true;
     });
-    server.on('connection', socket => {
-      establishedConnections += 1;
-      console.log('Socket remote address:', socket.remoteAddress);
-      console.log('Socket remote port:', socket.remotePort);
-    });
+    server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.once('listening', resolve));
 
     // Proxy forwards all connections to TEST_PORT
@@ -2590,7 +2586,7 @@ describe('ManageChannelsClient', () => {
     });
     proxy = null;
   });
-*/
+
   it('Throws an error when there is a bad proxy server', async () => {
     // Client configured with a port that the server is not listening on
     client = createClient(CLIENT_TEST_PORT);
