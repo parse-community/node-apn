@@ -177,6 +177,7 @@ describe('Client', () => {
       runSuccessfulRequest(),
     ]);
     didRequest = false;
+    client.destroySession(); // Don't pass in session to destroy, should not force a disconnection.
     await runSuccessfulRequest();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
@@ -1655,6 +1656,7 @@ describe('ManageChannelsClient', () => {
       runSuccessfulRequest(),
     ]);
     didRequest = false;
+    client.destroySession(); // Don't pass in session to destroy, should not force a disconnection.
     await runSuccessfulRequest();
     expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
     expect(requestsServed).to.equal(6);
