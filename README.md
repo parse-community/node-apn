@@ -59,7 +59,7 @@ var options = {
   production: false
 };
 
-var apnProvider = new apn.Provider(options);
+const apnProvider = new apn.Provider(options);
 ```
 
 By default, the provider will connect to the sandbox unless the environment variable `NODE_ENV=production` is set.
@@ -67,6 +67,10 @@ By default, the provider will connect to the sandbox unless the environment vari
 For more information about configuration options consult the [provider documentation](doc/provider.markdown).
 
 Help with preparing the key and certificate files for connection can be found in the [wiki][certificateWiki]
+
+⚠️ You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
+
+If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
 
 ### Connecting through an HTTP proxy
 
@@ -86,7 +90,7 @@ var options = {
   production: false
 };
 
-var apnProvider = new apn.Provider(options);
+const apnProvider = new apn.Provider(options);
 ```
 
 The provider will first send an HTTP CONNECT request to the specified proxy in order to establish an HTTP tunnel. Once established, it will create a new secure connection to the Apple Push Notification provider API through the tunnel.
@@ -111,7 +115,7 @@ var options = {
   production: false
 };
 
-var apnProvider = new apn.MultiProvider(options);
+const apnProvider = new apn.MultiProvider(options);
 ```
 
 ## Sending a notification
@@ -124,7 +128,7 @@ let deviceToken = "a9d0ed10e9cfd022a61cb08753f49c5a0b0dfb383697bf9f9d750a1003da1
 Create a notification object, configuring it with the relevant parameters (See the [notification documentation](doc/notification.markdown) for more details.)
 
 ```javascript
-var note = new apn.Notification();
+let note = new apn.Notification();
 
 note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
 note.badge = 3;
@@ -137,9 +141,12 @@ note.topic = "<your-app-bundle-id>";
 Send the notification to the API with `send`, which returns a promise.
 
 ```javascript
-apnProvider.send(note, deviceToken).then( (result) => {
+try {
+  const result = apnProvider.send(note, deviceToken);
   // see documentation for an explanation of result
-});
+} catch(error) {
+  // Handle error...
+}
 ```
 
 This will result in the the following notification payload being sent to the device
@@ -151,7 +158,7 @@ This will result in the the following notification payload being sent to the dev
 Create a Live Activity notification object, configuring it with the relevant parameters (See the [notification documentation](doc/notification.markdown) for more details.)
 
 ```javascript
-var note = new apn.Notification();
+let note = new apn.Notification();
 
 note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
 note.badge = 3;
@@ -170,9 +177,12 @@ note.contentState = {}
 Send the notification to the API with `send`, which returns a promise.
 
 ```javascript
-apnProvider.send(note, deviceToken).then( (result) => {
+try {
+  const result = await apnProvider.send(note, deviceToken)
   // see documentation for an explanation of result
-});
+} catch (error) {
+  // Handle error...
+}
 ```
 
 This will result in the the following notification payload being sent to the device
@@ -182,6 +192,6 @@ This will result in the the following notification payload being sent to the dev
 {"messageFrom":"John Appleseed","aps":{"badge":3,"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message", "relevance-score":75,"timestamp":1683129662,"stale-date":1683216062,"event":"update","content-state":{}}}
 ```
 
-You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
+## Manage Channels
 
-If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
+## Sending Broadcast Notifications

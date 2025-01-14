@@ -131,8 +131,9 @@ describe('MultiClient', () => {
       }
     };
     if (client) {
-      await client.shutdown(closeServer);
-      client = null;
+      await client.shutdown(() => {
+        client = null;
+      });
     }
     await closeServer();
   });
@@ -1229,8 +1230,9 @@ describe('ManageChannelsMultiClient', () => {
       }
     };
     if (client) {
-      await client.shutdown();
-      client = null;
+      await client.shutdown(() => {
+        client = null;
+      });
     }
     await closeServer();
   });

@@ -192,7 +192,7 @@ export class Provider extends EventEmitter {
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
-  shutdown(callback?: () => void): void;
+  shutdown(callback?: () => void): Promise<void>;
 }
 
 export class MultiProvider extends EventEmitter {
@@ -238,7 +238,7 @@ export class MultiProvider extends EventEmitter {
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
-  shutdown(callback?: () => void): void;
+  shutdown(callback?: () => void): Promise<void>;
 }
 
 export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
