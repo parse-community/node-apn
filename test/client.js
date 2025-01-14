@@ -2503,6 +2503,54 @@ describe('ManageChannelsClient', () => {
     expect(calledCallBack).to.be.true;
   });
 
+  it('Can connect and write successfully after destroy', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_POST;
+    const path = PATH_CHANNELS;
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-someheader': 'somevalue',
+      });
+      expect(requestBody).to.equal(MOCK_BODY);
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(200);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+    client = createClient(CLIENT_TEST_PORT);
+
+    const mockHeaders = { 'apns-someheader': 'somevalue' };
+    const mockNotification = {
+      headers: mockHeaders,
+      body: MOCK_BODY,
+    };
+    const performRequestExpectingDisconnect = async () => {
+      const bundleId = BUNDLE_ID;
+      const method = 'post';
+
+      await client.write(mockNotification, bundleId, 'channels', method);
+      expect(didRequest).to.be.true;
+      expect(establishedConnections).to.equal(1);
+      expect(requestsServed).to.equal(1);
+
+      await client.destroySession(client.manageChannelsSession);
+      await client.write(mockNotification, bundleId, 'channels', method);
+      expect(establishedConnections).to.equal(2);
+      expect(requestsServed).to.equal(2);
+    };
+    await performRequestExpectingDisconnect();
+  });
+
   it('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
