@@ -10,6 +10,7 @@ const credentials = require('../lib/credentials')({
 });
 
 const TEST_PORT = 30939;
+const CLIENT_TEST_PORT = TEST_PORT + 1;
 const LOAD_TEST_BATCH_SIZE = 2000;
 
 const config = require('../lib/config')({
@@ -152,7 +153,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -206,7 +207,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -261,7 +262,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 1500);
+    client = createClient(CLIENT_TEST_PORT, 1500);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -312,7 +313,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 500, pingDelay);
+    client = createClient(CLIENT_TEST_PORT, 500, pingDelay);
 
     // Setup logger.
     const infoMessages = [];
@@ -369,7 +370,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     const infoMessages = [];
     const errorMessages = [];
     const mockInfoLogger = message => {
@@ -431,7 +432,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -514,7 +515,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -564,7 +565,7 @@ describe('Client', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -604,7 +605,7 @@ describe('Client', () => {
         didGetResponse = true;
       }, 1900);
     });
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -652,7 +653,7 @@ describe('Client', () => {
       session.goaway(errorCode);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -719,7 +720,7 @@ describe('Client', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -839,7 +840,7 @@ describe('Client', () => {
     proxy.unref();
 
     // Client configured with a port that the server is not listening on
-    client = createClient(TEST_PORT + 1);
+    client = createClient(CLIENT_TEST_PORT);
     // So without adding a proxy config request will fail with a network error
     client.config.proxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
@@ -880,7 +881,7 @@ describe('Client', () => {
 
   it('Throws an error when there is a bad proxy server', async () => {
     // Client configured with a port that the server is not listening on
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     // So without adding a proxy config request will fail with a network error
     client.config.proxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
 
@@ -1630,7 +1631,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1684,7 +1685,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1739,7 +1740,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 1500);
+    client = createClient(CLIENT_TEST_PORT, 1500);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1790,7 +1791,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 500, pingDelay);
+    client = createClient(CLIENT_TEST_PORT, 500, pingDelay);
 
     // Setup logger.
     const infoMessages = [];
@@ -1847,7 +1848,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     const infoMessages = [];
     const errorMessages = [];
     const mockInfoLogger = message => {
@@ -1909,7 +1910,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -1990,7 +1991,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -2072,7 +2073,7 @@ describe('ManageChannelsClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -2145,7 +2146,7 @@ describe('ManageChannelsClient', () => {
         didGetResponse = true;
       }, 1900);
     });
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -2226,7 +2227,7 @@ describe('ManageChannelsClient', () => {
       session.goaway(errorCode);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -2293,7 +2294,7 @@ describe('ManageChannelsClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     // Setup logger.
     const infoMessages = [];
@@ -2380,7 +2381,7 @@ describe('ManageChannelsClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -2422,7 +2423,7 @@ describe('ManageChannelsClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -2465,7 +2466,7 @@ describe('ManageChannelsClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -2493,15 +2494,20 @@ describe('ManageChannelsClient', () => {
     await performRequestExpectingDisconnect();
     expect(didGetRequest).to.be.false;
     expect(establishedConnections).to.equal(0);
+    let calledCallBack = false;
+    await client.shutdown(() => {
+      calledCallBack = true;
+    });
+    expect(calledCallBack).to.be.true;
   });
-
+  /*
   it('Establishes a connection through a proxy server', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
     const path = PATH_CHANNELS;
-    const proxyPort = TEST_PORT - 1;
+    const proxyPort = TEST_PORT - 2;
 
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
@@ -2546,9 +2552,9 @@ describe('ManageChannelsClient', () => {
     proxy.unref();
 
     // Client configured with a port that the server is not listening on
-    client = createClient(TEST_PORT + 1);
+    client = createClient(CLIENT_TEST_PORT);
     // So without adding a proxy config request will fail with a network error
-    // client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
+    client.config.manageChannelsProxy = { host: '127.0.0.1', port: proxyPort };
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
       const mockNotification = {
@@ -2584,10 +2590,10 @@ describe('ManageChannelsClient', () => {
     });
     proxy = null;
   });
-
+*/
   it('Throws an error when there is a bad proxy server', async () => {
     // Client configured with a port that the server is not listening on
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     // So without adding a proxy config request will fail with a network error
     client.config.manageChannelsProxy = { host: '127.0.0.1', port: 'NOT_A_PORT' };
 

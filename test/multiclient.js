@@ -16,6 +16,7 @@ const credentials = require('../lib/credentials')({
 });
 
 const TEST_PORT = 30939;
+const CLIENT_TEST_PORT = TEST_PORT;
 const LOAD_TEST_BATCH_SIZE = 2000;
 
 const config = require('../lib/config')({
@@ -81,11 +82,13 @@ describe('MultiClient', () => {
       address: '127.0.0.1',
       clientCount: 2,
     });
+    let count = 1;
     mc.clients.forEach(c => {
-      c._mockOverrideUrl = `http://127.0.0.1:${port}`;
+      c._mockOverrideUrl = `http://127.0.0.1:${port + count}`;
       c.config.port = port;
       c.config.address = '127.0.0.1';
       c.config.requestTimeout = timeout;
+      count += 1;
     });
     return mc;
   };
@@ -143,7 +146,7 @@ describe('MultiClient', () => {
       expect(
         () =>
           new MultiClient({
-            port: TEST_PORT,
+            port: CLIENT_TEST_PORT,
             address: '127.0.0.1',
             clientCount,
           })
@@ -176,7 +179,7 @@ describe('MultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -231,7 +234,7 @@ describe('MultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 1500);
+    client = createClient(CLIENT_TEST_PORT, 1500);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -271,7 +274,7 @@ describe('MultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     const infoMessages = [];
     const errorMessages = [];
     const mockInfoLogger = message => {
@@ -336,7 +339,7 @@ describe('MultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -386,7 +389,7 @@ describe('MultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -426,7 +429,7 @@ describe('MultiClient', () => {
         didGetResponse = true;
       }, 1900);
     });
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -474,7 +477,7 @@ describe('MultiClient', () => {
       session.goaway(errorCode);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -517,7 +520,7 @@ describe('MultiClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -1180,11 +1183,13 @@ describe('ManageChannelsMultiClient', () => {
       manageChannelsPort: TEST_PORT,
       clientCount: 2,
     });
+    let count = 1;
     mc.clients.forEach(c => {
-      c._mockOverrideUrl = `http://127.0.0.1:${port}`;
-      c.config.manageChannelsPort = port;
+      c._mockOverrideUrl = `http://127.0.0.1:${port + count}`;
+      c.config.manageChannelsPort = TEST_PORT;
       c.config.manageChannelsAddress = '127.0.0.1';
       c.config.requestTimeout = timeout;
+      count += 1;
     });
     return mc;
   };
@@ -1242,7 +1247,7 @@ describe('ManageChannelsMultiClient', () => {
       expect(
         () =>
           new MultiClient({
-            port: TEST_PORT,
+            port: CLIENT_TEST_PORT,
             address: '127.0.0.1',
             clientCount,
           })
@@ -1275,7 +1280,7 @@ describe('ManageChannelsMultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1330,7 +1335,7 @@ describe('ManageChannelsMultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT, 1500);
+    client = createClient(CLIENT_TEST_PORT, 1500);
 
     const runSuccessfulRequest = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1370,7 +1375,7 @@ describe('ManageChannelsMultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
     const infoMessages = [];
     const errorMessages = [];
     const mockInfoLogger = message => {
@@ -1435,7 +1440,7 @@ describe('ManageChannelsMultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1485,7 +1490,7 @@ describe('ManageChannelsMultiClient', () => {
     server.on('connection', () => (establishedConnections += 1));
     await new Promise(resolve => server.on('listening', resolve));
 
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const runRequestWithInternalServerError = async () => {
       const mockHeaders = { 'apns-someheader': 'somevalue' };
@@ -1525,7 +1530,7 @@ describe('ManageChannelsMultiClient', () => {
         didGetResponse = true;
       }, 1900);
     });
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -1573,7 +1578,7 @@ describe('ManageChannelsMultiClient', () => {
       session.goaway(errorCode);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
@@ -1616,7 +1621,7 @@ describe('ManageChannelsMultiClient', () => {
       }, responseTimeout);
     });
     server.on('connection', () => (establishedConnections += 1));
-    client = createClient(TEST_PORT);
+    client = createClient(CLIENT_TEST_PORT);
 
     const onListeningPromise = new Promise(resolve => server.on('listening', resolve));
     await onListeningPromise;
