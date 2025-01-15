@@ -162,13 +162,13 @@ Create a Live Activity notification object and configure it with the relevant pa
 ```javascript
 let note = new apn.Notification();
 
+note.topic = "<your-app-bundle-id>.push-type.liveactivity";
 note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+note.pushType = "liveactivity",
 note.badge = 3;
 note.sound = "ping.aiff";
 note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
 note.payload = {'messageFrom': 'John Appleseed'};
-note.topic = "<your-app-bundle-id>";
-note.pushType = "liveactivity",
 note.relevanceScore = 75,
 note.timestamp = Math.floor(Date.now() / 1000); // Current time
 note.staleDate = Math.floor(Date.now() / 1000) + (8 * 3600); // Expires 8 hour from now.
@@ -259,12 +259,11 @@ let note = new apn.Notification();
 
 note.channelId = "dHN0LXNyY2gtY2hubA=="; // Required
 note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+note.pushType = "liveactivity",
 note.badge = 3;
 note.sound = "ping.aiff";
 note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
 note.payload = {'messageFrom': 'John Appleseed'};
-note.topic = "<your-app-bundle-id>";
-note.pushType = "liveactivity",
 note.relevanceScore = 75,
 note.timestamp = Math.floor(Date.now() / 1000); // Current time
 note.staleDate = Math.floor(Date.now() / 1000) + (8 * 3600); // Expires 8 hour from now.
