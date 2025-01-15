@@ -148,6 +148,7 @@ describe('Notification', function () {
 
       expect(note.headers()).to.deep.equal({
         'apns-channel-id': 'io.apn.channel',
+        'apns-expiration': 1000,
         'apns-request-id': 'io.apn.request',
       });
     });
