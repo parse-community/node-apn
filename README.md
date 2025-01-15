@@ -38,7 +38,7 @@ $ npm install @parse/node-apn --save
 
 # Quick Start
 
-This readme is a brief introduction, please refer to the full [documentation](doc/apn.markdown) in `doc/` for more details.
+This readme is a brief introduction; please refer to the full [documentation](doc/pan.markdown) in `doc/` for more details.
 
 If you have previously used v1.x and wish to learn more about what's changed in v2.0, please see [What's New](doc/whats-new.markdown)
 
@@ -66,11 +66,11 @@ const apnProvider = new apn.Provider(options);
 
 By default, the provider will connect to the sandbox unless the environment variable `NODE_ENV=production` is set.
 
-For more information about configuration options consult the [provider documentation](doc/provider.markdown).
+For more information about configuration options, consult the [provider documentation](doc/provider.markdown).
 
 Help with preparing the key and certificate files for connection can be found in the [wiki][certificateWiki]
 
-⚠️ You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app then there is no need for more than one `Provider`.
+⚠️ You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app, there is no need for more than one `Provider`.
 
 If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
 
@@ -121,7 +121,7 @@ const apnProvider = new apn.MultiProvider(options);
 ```
 
 ## Sending a notification
-To send a notification you will first need a device token from your app as a string
+To send a notification, you will first need a device token from your app as a string.
 
 ```javascript
 let deviceToken = "a9d0ed10e9cfd022a61cb08753f49c5a0b0dfb383697bf9f9d750a1003da19c7"
@@ -151,13 +151,13 @@ try {
 }
 ```
 
-This will result in the the following notification payload being sent to the device
+This will result in the following notification payload being sent to the device.
 
 ```json
 {"messageFrom":"John Appelseed","aps":{"badge":3,"sound":"ping.aiff","alert":"\uD83D\uDCE7 \u2709 You have a new message"}}
 ```
 
-Create a Live Activity notification object, configuring it with the relevant parameters (See the [notification documentation](doc/notification.markdown) for more details.)
+Create a Live Activity notification object and configure it with the relevant parameters (See the [notification documentation](doc/notification.markdown) for more details.)
 
 ```javascript
 let note = new apn.Notification();
@@ -181,13 +181,13 @@ Send the notification to the API with `send`, which returns a promise.
 ```javascript
 try {
   const result = await apnProvider.send(note, deviceToken);
-  // see documentation for an explanation of result
+  // see the documentation for an explanation of the result
 } catch (error) {
   // Handle error...
 }
 ```
 
-This will result in the the following notification payload being sent to the device
+This will result in the following notification payload being sent to the device.
 
 
 ```json
@@ -195,7 +195,7 @@ This will result in the the following notification payload being sent to the dev
 ```
 
 ## Manage Channels
-Live Activities can be used to broadcast push notifications over channels. To do so, you will need your apps `bundleId`. 
+Live Activities can be used to broadcast push notifications over channels. To do so, you will need your apps' `bundleId`. 
 
 ```javascript
 let bundleId = "com.node.apn";
@@ -215,13 +215,13 @@ Create a channel with `manageChannels` and the `create` action, which returns a 
 ```javascript
 try {
   const result = await apnProvider.manageChannels(note, bundleId, 'create');
-  // see documentation for an explanation of result
+  // see the documentation for an explanation of the result
 } catch (error) {
   // Handle error...
 }
 ```
 
-If the channel is created succesffuly, the result will look like the folowing:
+If the channel is created successfully, the result will look like the following:
 ```javascript
 { 
   apns-request-id: '0309F412-AA57-46A8-9AC6-B5AECA8C4594', 
@@ -229,12 +229,12 @@ If the channel is created succesffuly, the result will look like the folowing:
 }
 ```
 
-Similarly, `manageChannels` has additional `actions` that allow you to `read`, `readAll`, and `delete` channels. The `read` and `delete` action require similar information to the `create` example above with the exception that they require `note.channelId` to be populated. To request all active channel id's, you can use the `readAll` action:
+Similarly, `manageChannels` has additional `action`s that allow you to `read`, `readAll`, and `delete` channels. The `read` and `delete` actions require similar information to the `create` example above, with the exception that they require `note.channelId` to be populated. To request all active channel id's, you can use the `readAll` action:
 
 ```javascript
 try {
   const result = await apnProvider.manageChannels(note, bundleId, 'readAll');
-  // see documentation for an explanation of result
+  // see the documentation for an explanation of the result
 } catch (error) {
   // Handle error...
 }
@@ -252,7 +252,7 @@ After the promise is fulfilled, `result` will look like the following:
 Further information about managing channels can be found in [Apple's documentation](https://developer.apple.com/documentation/usernotifications/sending-channel-management-requests-to-apns).
 
 ## Sending A Broadcast Notification
-After a channel is created using `manageChannels`, broadcast push notifications can be sent to any device subscribed to the respective `channelId` created for a `bundleId`. A broadcast notification looks very similar to a standard Live Activity notification mentioned above, but also requires `note.channelId` to be populated. An example is below:
+After a channel is created using `manageChannels`, broadcast push notifications can be sent to any device subscribed to the respective `channelId` created for a `bundleId`. A broadcast notification looks similar to a standard Live Activity notification mentioned above but requires `note.channelId` to be populated. An example is below:
 
 ```javascript
 let note = new apn.Notification();
