@@ -59,9 +59,13 @@ export interface ProviderOptions {
    */
   requestTimeout?: number;
   /**
-   * Connect through an HTTP proxy
+   * Connect through an HTTP proxy when sending notifications
    */
   proxy?: { host: string, port: number|string }
+  /**
+   * Connect through an HTTP proxy when managing channels
+   */
+  manageChannelsProxy?: { host: string, port: number|string }
 }
 
 export interface MultiProviderOptions extends ProviderOptions {
