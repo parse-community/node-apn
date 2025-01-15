@@ -38,7 +38,7 @@ $ npm install @parse/node-apn --save
 
 # Quick Start
 
-This readme is a brief introduction; please refer to the full [documentation](doc/pan.markdown) in `doc/` for more details.
+This readme is a brief introduction; please refer to the full [documentation](doc/apn.markdown) in `doc/` for more details.
 
 If you have previously used v1.x and wish to learn more about what's changed in v2.0, please see [What's New](doc/whats-new.markdown)
 
