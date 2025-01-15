@@ -21,6 +21,8 @@ A Node.js module for interfacing with the Apple Push Notification service.
     - [Connecting through an HTTP proxy](#connecting-through-an-http-proxy)
     - [Using a pool of http/2 connections](#using-a-pool-of-http2-connections)
   - [Sending a notification](#sending-a-notification)
+  - [Managing channels](#manage-channels)
+  - [Sending a broadcast notification](#sending-a-broadcast-notification)
 
 # Features
 
@@ -178,7 +180,7 @@ Send the notification to the API with `send`, which returns a promise.
 
 ```javascript
 try {
-  const result = await apnProvider.send(note, deviceToken)
+  const result = await apnProvider.send(note, deviceToken);
   // see documentation for an explanation of result
 } catch (error) {
   // Handle error...
@@ -193,5 +195,92 @@ This will result in the the following notification payload being sent to the dev
 ```
 
 ## Manage Channels
+Live Activities can be used to broadcast push notifications over channels. To do so, you will need your apps `bundleId`. 
 
-## Sending Broadcast Notifications
+```javascript
+let bundleId = "com.node.apn";
+```
+
+Create a notification object, configuring it with the relevant parameters (See the [notification documentation](doc/notification.markdown) for more details.)
+
+```javascript
+let note = new apn.Notification();
+
+note.requestId = "0309F412-AA57-46A8-9AC6-B5AECA8C4594"; // Optional
+note.payload = {'message-storage-policy': '1', 'push-type': 'liveactivity'}; // Required
+```
+
+Create a channel with `manageChannels` and the `create` action, which returns a promise.
+
+```javascript
+try {
+  const result = await apnProvider.manageChannels(note, bundleId, 'create');
+  // see documentation for an explanation of result
+} catch (error) {
+  // Handle error...
+}
+```
+
+If the channel is created succesffuly, the result will look like the folowing:
+```javascript
+{ 
+  apns-request-id: '0309F412-AA57-46A8-9AC6-B5AECA8C4594', 
+  apns-channel-id: 'dHN0LXNyY2gtY2hubA==' // The new channel
+}
+```
+
+Similarly, `manageChannels` has additional `actions` that allow you to `read`, `readAll`, and `delete` channels. The `read` and `delete` action require similar information to the `create` example above with the exception that they require `note.channelId` to be populated. To request all active channel id's, you can use the `readAll` action:
+
+```javascript
+try {
+  const result = await apnProvider.manageChannels(note, bundleId, 'readAll');
+  // see documentation for an explanation of result
+} catch (error) {
+  // Handle error...
+}
+```
+
+After the promise is fulfilled, `result` will look like the following:
+
+```javascript
+{ 
+  apns-request-id: 'some id value', 
+  channels: ['dHN0LXNyY2gtY2hubA==', 'eCN0LXNyY2gtY2hubA==' ...] // A list of active channels
+}
+```
+
+Further information about managing channels can be found in [Apple's documentation](https://developer.apple.com/documentation/usernotifications/sending-channel-management-requests-to-apns).
+
+## Sending A Broadcast Notification
+After a channel is created using `manageChannels`, broadcast push notifications can be sent to any device subscribed to the respective `channelId` created for a `bundleId`. A broadcast notification looks very similar to a standard Live Activity notification mentioned above, but also requires `note.channelId` to be populated. An example is below:
+
+```javascript
+let note = new apn.Notification();
+
+note.channelId = "dHN0LXNyY2gtY2hubA=="; // Required
+note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+note.badge = 3;
+note.sound = "ping.aiff";
+note.alert = "\uD83D\uDCE7 \u2709 You have a new message";
+note.payload = {'messageFrom': 'John Appleseed'};
+note.topic = "<your-app-bundle-id>";
+note.pushType = "liveactivity",
+note.relevanceScore = 75,
+note.timestamp = Math.floor(Date.now() / 1000); // Current time
+note.staleDate = Math.floor(Date.now() / 1000) + (8 * 3600); // Expires 8 hour from now.
+note.event = "update"
+note.contentState = {}
+```
+
+Send the broadcast notification to the API with `broadcast`, which returns a promise.
+
+```javascript
+try {
+  const result = await apnProvider.broadcast(note, bundleId);
+  // see documentation for an explanation of result
+} catch (error) {
+  // Handle error...
+}
+```
+
+Further information about broadcast notifications can be found in [Apple's documentation](https://developer.apple.com/documentation/usernotifications/sending-broadcast-push-notification-requests-to-apns).
