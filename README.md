@@ -195,7 +195,7 @@ This will result in the following notification payload being sent to the device.
 ```
 
 ## Manage Channels
-Live Activities can be used to broadcast push notifications over channels. To do so, you will need your apps' `bundleId`. 
+Starting in iOS 18 and iPadOS 18 Live Activities can be used to broadcast push notifications over channels. To do so, you will need your apps' `bundleId`. 
 
 ```javascript
 let bundleId = "com.node.apn";
@@ -252,7 +252,7 @@ After the promise is fulfilled, `result` will look like the following:
 Further information about managing channels can be found in [Apple's documentation](https://developer.apple.com/documentation/usernotifications/sending-channel-management-requests-to-apns).
 
 ## Sending A Broadcast Notification
-After a channel is created using `manageChannels`, broadcast push notifications can be sent to any device subscribed to the respective `channelId` created for a `bundleId`. A broadcast notification looks similar to a standard Live Activity notification mentioned above but requires `note.channelId` to be populated. An example is below:
+Starting in iOS 18 and iPadOS 18, after a channel is created using `manageChannels`, broadcast push notifications can be sent to any device subscribed to the respective `channelId` created for a `bundleId`. A broadcast notification looks similar to a standard Live Activity notification mentioned above but requires `note.channelId` to be populated. An example is below:
 
 ```javascript
 let note = new apn.Notification();
