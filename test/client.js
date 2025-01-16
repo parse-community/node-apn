@@ -2,7 +2,7 @@ const VError = require('verror');
 const net = require('net');
 const http2 = require('http2');
 
-const { HTTP2_METHOD_POST } = http2.constants;
+const { HTTP2_METHOD_POST, HTTP2_METHOD_GET, HTTP2_METHOD_DELETE } = http2.constants;
 
 const debug = require('debug')('apn');
 const credentials = require('../lib/credentials')({
@@ -1662,12 +1662,21 @@ describe('ManageChannelsClient', () => {
     expect(requestsServed).to.equal(6);
   });
 
-  it('Treats HTTP 200 responses as successful for allChannels', async () => {
+  it('Treats HTTP 201 responses as successful for channels', async () => {
     let didRequest = false;
     let establishedConnections = 0;
     let requestsServed = 0;
     const method = HTTP2_METHOD_POST;
-    const path = PATH_ALL_CHANNELS;
+    const path = PATH_CHANNELS;
+    const channel = 'dHN0LXNyY2gtY2hubA==';
+    const requestId = '0309F412-AA57-46A8-9AC6-B5AECA8C4594';
+    const uniqueId = '4C106C5F-2013-40B9-8193-EAA270B8F2C5';
+    const additionalHeaderInfo = {
+      'apns-channel-id': channel,
+      'apns-request-id': requestId,
+      'apns-unique-id': uniqueId,
+    };
+
     server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
       expect(req.headers).to.deep.equal({
         ':authority': '127.0.0.1',
@@ -1679,7 +1688,7 @@ describe('ManageChannelsClient', () => {
       expect(requestBody).to.equal(MOCK_BODY);
       // res.setHeader('X-Foo', 'bar');
       // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
-      res.writeHead(200);
+      res.writeHead(201, additionalHeaderInfo);
       res.end('');
       requestsServed += 1;
       didRequest = true;
@@ -1696,8 +1705,128 @@ describe('ManageChannelsClient', () => {
         body: MOCK_BODY,
       };
       const bundleId = BUNDLE_ID;
-      const result = await client.write(mockNotification, bundleId, 'allChannels', 'post');
-      expect(result).to.deep.equal({ bundleId });
+      const result = await client.write(mockNotification, bundleId, 'channels', 'post');
+      expect(result).to.deep.equal({ ...additionalHeaderInfo, bundleId });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
+  });
+
+  it('Treats HTTP 204 responses as successful for channels', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_DELETE;
+    const path = PATH_CHANNELS;
+    const channel = 'dHN0LXNyY2gtY2hubA==';
+    const requestId = '0309F412-AA57-46A8-9AC6-B5AECA8C4594';
+    const additionalHeaderInfo = { 'apns-request-id': requestId };
+
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-channel-id': channel,
+        ...additionalHeaderInfo,
+      });
+      expect(requestBody).to.be.empty;
+      // res.setHeader('X-Foo', 'bar');
+      // res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8' });
+      res.writeHead(204, additionalHeaderInfo);
+      res.end('');
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(CLIENT_TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-channel-id': channel, ...additionalHeaderInfo };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: {},
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'channels', 'delete');
+      expect(result).to.deep.equal({ ...additionalHeaderInfo, bundleId });
+      expect(didRequest).to.be.true;
+    };
+    expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
+    // Validate that when multiple valid requests arrive concurrently,
+    // only one HTTP/2 connection gets established
+    await Promise.all([
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+      runSuccessfulRequest(),
+    ]);
+    didRequest = false;
+    await runSuccessfulRequest();
+    expect(establishedConnections).to.equal(1); // should establish a connection to the server and reuse it
+    expect(requestsServed).to.equal(6);
+  });
+
+  it('Treats HTTP 200 responses as successful for allChannels', async () => {
+    let didRequest = false;
+    let establishedConnections = 0;
+    let requestsServed = 0;
+    const method = HTTP2_METHOD_GET;
+    const path = PATH_ALL_CHANNELS;
+    const channels = { channels: ['dHN0LXNyY2gtY2hubA=='] };
+    const requestId = '0309F412-AA57-46A8-9AC6-B5AECA8C4594';
+    const uniqueId = '4C106C5F-2013-40B9-8193-EAA270B8F2C5';
+    const additionalHeaderInfo = { 'apns-request-id': requestId, 'apns-unique-id': uniqueId };
+
+    server = createAndStartMockServer(TEST_PORT, (req, res, requestBody) => {
+      expect(req.headers).to.deep.equal({
+        ':authority': '127.0.0.1',
+        ':method': method,
+        ':path': path,
+        ':scheme': 'https',
+        'apns-request-id': requestId,
+      });
+
+      expect(requestBody).to.be.empty;
+
+      const data = JSON.stringify(channels);
+      res.writeHead(200, additionalHeaderInfo);
+      res.write(data);
+      res.end();
+      requestsServed += 1;
+      didRequest = true;
+    });
+    server.on('connection', () => (establishedConnections += 1));
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(CLIENT_TEST_PORT);
+
+    const runSuccessfulRequest = async () => {
+      const mockHeaders = { 'apns-request-id': requestId };
+      const mockNotification = {
+        headers: mockHeaders,
+        body: {},
+      };
+      const bundleId = BUNDLE_ID;
+      const result = await client.write(mockNotification, bundleId, 'allChannels', 'get');
+      expect(result).to.deep.equal({ ...additionalHeaderInfo, bundleId, ...channels });
       expect(didRequest).to.be.true;
     };
     expect(establishedConnections).to.equal(0); // should not establish a connection until it's needed
