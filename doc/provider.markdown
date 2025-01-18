@@ -13,9 +13,9 @@ Options:
 
  - `key` {Buffer|String} The filename of the connection key to load from disk, or a Buffer/String containing the key data. (Defaults to: `key.pem`)
 
- - `ca` An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048).
+ - `ca` An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048)
 
- - `pfx` {Buffer|String} File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above.
+ - `pfx` {Buffer|String} File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above
 
  - `passphrase` {String} The passphrase for the connection key, if required
 
@@ -23,7 +23,23 @@ Options:
 
  - `rejectUnauthorized` {Boolean} Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
 
+ - `address` {String} The address of the APNs server to send notifications to. If not provided, will connect to standard APNs server
+
+- `port` {Number} The port of the APNs server to send notifications to. (Defaults to 443)
+
+ - `manageChannelsAddress` {String} The address of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management server
+
+ - `manageChannelsPort` {Number} The port of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management port
+
+ - `proxy` {host: String, port: Number|String} Connect through an HTTP proxy when sending notifications
+
+ - `manageChannelsProxy` {host: String, port: Number|String} Connect through an HTTP proxy when managing channels
+
+ - `rejectUnauthorized` {Boolean} Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
+
  - `connectionRetryLimit` {Number} The maximum number of connection failures that will be tolerated before `apn.Provider` will "give up". [See below.](#connection-retry-limit) (Defaults to: 3)
+
+ - `heartBeat` {Number} The delay interval in ms that apn will ping APNs servers. (Defaults to: 60000)
 
 - `requestTimeout` {Number} The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
 

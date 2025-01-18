@@ -31,11 +31,11 @@ export interface ProviderOptions {
    */
   key?: string|Buffer;
   /**
-   * An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048).
+   * An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048)
    */
   ca?: (string|Buffer)[];
   /**
-   * File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above.
+   * File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above
    */
   pfx?: string|Buffer;
   /**
@@ -47,17 +47,21 @@ export interface ProviderOptions {
    */
   production?: boolean;
   /**
-   * Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
+   * The address of the APNs server to send notifications to. If not provided, will connect to standard APNs server
    */
-  rejectUnauthorized?: boolean;
+  address?: string;
   /**
-   * The maximum number of connection failures that will be tolerated before `apn` will "terminate". (Defaults to: 3)
+   * The port of the APNs server to send notifications to. (Defaults to 443)
    */
-  connectionRetryLimit?: number;
+  port?: number;
   /**
-   * The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
+   * The address of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management server
    */
-  requestTimeout?: number;
+  manageChannelsAddress?: string;
+  /**
+   * The port of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management port
+   */
+  manageChannelsPort?: number;
   /**
    * Connect through an HTTP proxy when sending notifications
    */
@@ -66,6 +70,22 @@ export interface ProviderOptions {
    * Connect through an HTTP proxy when managing channels
    */
   manageChannelsProxy?: { host: string, port: number|string }
+  /**
+   * Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
+   */
+  rejectUnauthorized?: boolean;
+  /**
+   * The maximum number of connection failures that will be tolerated before `apn` will "terminate". (Defaults to: 3)
+   */
+  connectionRetryLimit?: number;
+  /**
+   * The delay interval in ms that apn will ping APNs servers. (Defaults to: 60000)
+   */
+  heartBeat?: number;
+  /**
+   * The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
+   */
+  requestTimeout?: number;
 }
 
 export interface MultiProviderOptions extends ProviderOptions {
