@@ -63,13 +63,36 @@ The `Provider` can continue to be used for sending notifications and the counter
 
 ## Class: apn.Provider
 
+`apn.Provider` provides a number of methods for sending notifications, broadcasting notifications, and managing channels. Calling any of the methods will return a `Promise` for each notification and is discussed more in [Results from APN Provider Methods](#results-from-apnprovider-methods).
+
 ### connection.send(notification, recipients)
 
-This is main interface for sending notifications. Create a `Notification` object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+This is the main interface for sending notifications. Create a `Notification` object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
 
 > A "recipient" is a `String` containing the hex-encoded device token.
 
-Calling `send` will return a `Promise`. The Promise will resolve after each notification (per token) has reached a final state. Each notification can end in one of three possible states:
+Calling `send` will return a `Promise`. The Promise will resolve after each notification (per token) has reached a final state.
+
+### connection.manageChannels(notification, bundleId, action)
+This is the interface for managing broadcast channels. Create a single `Notification` object or an aray of them and pass the notification(s) in, along with a bundleId, and an action (`create`, `read`, `readAll`, `delete`) and node-apn will take care of the rest, asking the APNs to perform the action using the criteria specified in each notification.
+
+> A "bundleId" is a `String` containing bundle identifier for the application.
+
+> An "action" is a `String` containing: `create`, `read`, `readAll`, or `delete` and represents what action to perform with a channel (See more in [Apple Documentation](https://developer.apple.com/documentation/usernotifications/sending-channel-management-requests-to-apns)).
+
+Calling `manageChannels` will return a `Promise`. The Promise will resolve after each notification has reached a final state.
+
+### connection.broadcast(notification, bundleId)
+
+This is the interface for broadcasting Live Activity notifications. Create a single `Notification` object or an aray of them and pass the notification(s) in, along with a bundleId and node-apn will take care of the rest, asking the APNs to broadcast using the criteria specified in each notification.
+
+> A "bundleId" is a `String` containing bundle identifier for the application.
+
+Calling `broadcast` will return a `Promise`. The Promise will resolve after each notification has reached a final state.
+
+### Results from apn.Provider methods
+
+ Each notification can end in one of three possible states:
 
   - `sent` - the notification was accepted by Apple for delivery to the given recipient
   - `failed` (rejected) - the notification was rejected by Apple. A rejection has an associated `status` and `reason` which is included.
@@ -79,15 +102,15 @@ When the returned `Promise` resolves, its value will be an Object containing two
 
 #### sent
 
-An array of device tokens to which the notification was successfully sent and accepted by Apple.
+An array of device tokens or bundle identifiers to which the notification was successfully sent and accepted by Apple.
 
 Being `sent` does **not** guarantee the notification will be _delivered_, other unpredictable factors - including whether the device is reachable - can ultimately prevent delivery.
 
 #### failed
 
-An array of objects for each failed token. Each object will contain the device token which failed and details of the failure which will differ between rejected and errored notifications.
+An array of objects for each failed token or bundle identifier. Each object will contain the device token or bundle identifier which failed and details of the failure which will differ between rejected and errored notifications.
 
-For **rejected** notifications the object will take the following form
+For **rejected** notifications using `send()`, the object will take the following form
 
 ```javascript
 {
@@ -101,7 +124,7 @@ For **rejected** notifications the object will take the following form
 
 More details about the response and associated status codes can be found in the [HTTP/2 Response from APN documentation][http2-response].
 
-If a failed notification was instead caused by an **error** then it will have an `error` property instead of `response` and `status`:
+If a failed notification using `send()` was instead caused by an **error** then it will have an `error` property instead of `response` and `status`:
 
 ```javascript
 {
