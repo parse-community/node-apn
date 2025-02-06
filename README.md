@@ -70,9 +70,10 @@ For more information about configuration options, consult the [provider document
 
 Help with preparing the key and certificate files for connection can be found in the [wiki][certificateWiki]
 
-⚠️ You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app, there is no need for more than one `Provider`.
-
-If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
+> [!WARNING] 
+> You should only create one `Provider` per-process for each certificate/key pair you have. You do not need to create a new `Provider` for each notification. If you are only sending notifications to one app, there is no need for more than one `Provider`.
+>
+> If you are constantly creating `Provider` instances in your app, make sure to call `Provider.shutdown()` when you are done with each provider to release its resources and memory.
 
 ### Connecting through an HTTP proxy
 
