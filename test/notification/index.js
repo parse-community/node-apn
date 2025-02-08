@@ -17,6 +17,11 @@ describe('Notification', function () {
       expect(note.topic).to.equal('io.apn.node');
       expect(compiledOutput()).to.have.nested.deep.property('aps.badge', 5);
     });
+
+    it('no initialization values', function () {
+      expect(note.compile()).to.equal('{}');
+      expect(compiledOutput()).to.be.empty;
+    });
   });
 
   describe('rawPayload', function () {
