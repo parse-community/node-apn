@@ -1761,7 +1761,7 @@ describe('ManageChannelsClient', () => {
       const mockHeaders = { 'apns-channel-id': channel, ...additionalHeaderInfo };
       const mockNotification = {
         headers: mockHeaders,
-        body: {},
+        body: '{}',
       };
       const bundleId = BUNDLE_ID;
       const result = await client.write(mockNotification, bundleId, 'channels', 'delete');
@@ -1822,7 +1822,7 @@ describe('ManageChannelsClient', () => {
       const mockHeaders = { 'apns-request-id': requestId };
       const mockNotification = {
         headers: mockHeaders,
-        body: {},
+        body: '{}',
       };
       const bundleId = BUNDLE_ID;
       const result = await client.write(mockNotification, bundleId, 'allChannels', 'get');
