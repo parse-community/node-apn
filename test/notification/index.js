@@ -17,6 +17,11 @@ describe('Notification', function () {
       expect(note.topic).to.equal('io.apn.node');
       expect(compiledOutput()).to.have.nested.deep.property('aps.badge', 5);
     });
+
+    it('no initialization values', function () {
+      expect(note.compile()).to.equal('{}');
+      expect(compiledOutput()).to.be.empty;
+    });
   });
 
   describe('rawPayload', function () {
@@ -109,6 +114,51 @@ describe('Notification', function () {
     });
   });
 
+  describe('addPushTypeToPayloadIfNeeded', function () {
+    it('add liveactivity push-type to payload when it is missing', function () {
+      note.addPushTypeToPayloadIfNeeded();
+
+      expect(note.payload).to.deep.equal({ 'push-type': 'liveactivity' });
+    });
+
+    it('do not overwrite push-type if it is already present', function () {
+      note.payload['push-type'] = 'alert';
+      note.addPushTypeToPayloadIfNeeded();
+
+      expect(note.payload).to.deep.equal({ 'push-type': 'alert' });
+    });
+
+    it('do not add push-type if rawPayload is present', function () {
+      const payload = { some: 'payload' };
+      note = new Notification({ rawPayload: payload });
+      note.addPushTypeToPayloadIfNeeded();
+
+      expect(note.rawPayload).to.deep.equal({ some: 'payload' });
+      expect(compiledOutput()).to.deep.equal({ some: 'payload' });
+    });
+  });
+
+  describe('removeNonChannelRelatedProperties', function () {
+    it('headers only contains channel related properties', function () {
+      note.priority = 5;
+      note.id = '123e4567-e89b-12d3-a456-42665544000';
+      note.pushType = 'alert';
+      note.expiry = 1000;
+      note.topic = 'io.apn.node';
+      note.collapseId = 'io.apn.collapse';
+      note.requestId = 'io.apn.request';
+      note.channelId = 'io.apn.channel';
+      note.pushType = 'liveactivity';
+      note.removeNonChannelRelatedProperties();
+
+      expect(note.headers()).to.deep.equal({
+        'apns-channel-id': 'io.apn.channel',
+        'apns-expiration': 1000,
+        'apns-request-id': 'io.apn.request',
+      });
+    });
+  });
+
   describe('headers', function () {
     it('contains no properties by default', function () {
       expect(note.headers()).to.deep.equal({});
@@ -166,6 +216,22 @@ describe('Notification', function () {
         note.collapseId = 'io.apn.collapse';
 
         expect(note.headers()).to.have.property('apns-collapse-id', 'io.apn.collapse');
+      });
+    });
+
+    context('requestId is set', function () {
+      it('contains the apns-request-id header', function () {
+        note.requestId = 'io.apn.request';
+
+        expect(note.headers()).to.have.property('apns-request-id', 'io.apn.request');
+      });
+    });
+
+    context('channelId is set', function () {
+      it('contains the apns-request-id header', function () {
+        note.channelId = 'io.apn.channel';
+
+        expect(note.headers()).to.have.property('apns-channel-id', 'io.apn.channel');
       });
     });
 

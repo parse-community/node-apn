@@ -41,53 +41,51 @@ describe('Provider', function () {
     });
   });
 
-  describe('send', function () {
-    describe('single notification behaviour', function () {
+  describe('send', async () => {
+    describe('single notification behaviour', async () => {
       let provider;
 
-      context('transmission succeeds', function () {
-        beforeEach(function () {
+      context('transmission succeeds', async () => {
+        beforeEach(async () => {
           provider = new Provider({ address: 'testapi' });
 
           fakes.client.write.onCall(0).returns(Promise.resolve({ device: 'abcd1234' }));
         });
 
-        it('invokes the writer with correct `this`', function () {
-          return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            expect(fakes.client.write).to.be.calledOn(fakes.client);
-          });
+        it('invokes the writer with correct `this`', async () => {
+          await provider.send(notificationDouble(), 'abcd1234');
+          expect(fakes.client.write).to.be.calledOn(fakes.client);
         });
 
-        it('writes the notification to the client once', function () {
-          return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            const notification = notificationDouble();
-            const builtNotification = {
-              headers: notification.headers(),
-              body: notification.compile(),
-            };
-            expect(fakes.client.write).to.be.calledOnce;
-            expect(fakes.client.write).to.be.calledWith(builtNotification, 'abcd1234');
-          });
+        it('writes the notification to the client once', async () => {
+          await provider.send(notificationDouble(), 'abcd1234');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const device = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(builtNotification, device, 'device', 'post');
         });
 
-        it('does not pass the array index to writer', function () {
-          return provider.send(notificationDouble(), 'abcd1234').then(function () {
-            expect(fakes.client.write.firstCall.args[2]).to.be.undefined;
-          });
+        it('does not pass the array index to writer', async () => {
+          await provider.send(notificationDouble(), 'abcd1234');
+          expect(fakes.client.write.firstCall.args[4]).to.be.undefined;
         });
 
-        it('resolves with the device token in the sent array', function () {
-          return expect(provider.send(notificationDouble(), 'abcd1234')).to.become({
+        it('resolves with the device token in the sent array', async () => {
+          const result = await provider.send(notificationDouble(), 'abcd1234');
+          expect(result).to.deep.equal({
             sent: [{ device: 'abcd1234' }],
             failed: [],
           });
         });
       });
 
-      context('error occurs', function () {
-        let promise;
-
-        beforeEach(function () {
+      context('error occurs', async () => {
+        it('resolves with the device token, status code and response in the failed array', async () => {
           const provider = new Provider({ address: 'testapi' });
 
           fakes.client.write.onCall(0).returns(
@@ -97,11 +95,27 @@ describe('Provider', function () {
               response: { reason: 'BadDeviceToken' },
             })
           );
-          promise = provider.send(notificationDouble(), 'abcd1234');
+          const result = await provider.send(notificationDouble(), 'abcd1234');
+
+          expect(result).to.deep.equal({
+            sent: [],
+            failed: [{ device: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } }],
+          });
         });
 
-        it('resolves with the device token, status code and response in the failed array', function () {
-          return expect(promise).to.eventually.deep.equal({
+        it('rejects with the device token, status code and response in the failed array', async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(
+            Promise.reject({
+              device: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          const result = await provider.send(notificationDouble(), 'abcd1234');
+
+          expect(result).to.deep.equal({
             sent: [],
             failed: [{ device: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } }],
           });
@@ -109,8 +123,8 @@ describe('Provider', function () {
       });
     });
 
-    context('when multiple tokens are passed', function () {
-      beforeEach(function () {
+    context('when multiple tokens are passed', async () => {
+      beforeEach(async () => {
         fakes.resolutions = [
           { device: 'abcd1234' },
           { device: 'adfe5969', status: '400', response: { reason: 'MissingTopic' } },
@@ -125,67 +139,494 @@ describe('Provider', function () {
         ];
       });
 
-      context('streams are always returned', function () {
-        let promise;
+      context('streams are always returned', async () => {
+        let response;
 
-        beforeEach(function () {
+        beforeEach(async () => {
           const provider = new Provider({ address: 'testapi' });
 
           for (let i = 0; i < fakes.resolutions.length; i++) {
             fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
           }
 
-          promise = provider.send(
+          response = await provider.send(
             notificationDouble(),
             fakes.resolutions.map(res => res.device)
           );
-
-          return promise;
         });
 
-        it('resolves with the sent notifications', function () {
-          return promise.then(response => {
-            expect(response.sent).to.deep.equal([{ device: 'abcd1234' }, { device: 'bcfe4433' }]);
+        it('resolves with the sent notifications', async () => {
+          expect(response.sent).to.deep.equal([{ device: 'abcd1234' }, { device: 'bcfe4433' }]);
+        });
+
+        it('resolves with the device token, status code and response or error of the unsent notifications', async () => {
+          expect(response.failed[3].error).to.be.an.instanceof(Error);
+          response.failed[3].error = { message: response.failed[3].error.message };
+          expect(response.failed).to.deep.equal(
+            [
+              { device: 'adfe5969', status: '400', response: { reason: 'MissingTopic' } },
+              {
+                device: 'abcd1335',
+                status: '410',
+                response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+              },
+              { device: 'aabbc788', status: '413', response: { reason: 'PayloadTooLarge' } },
+              { device: 'fbcde238', error: { message: 'connection failed' } },
+            ],
+            `Unexpected result: ${JSON.stringify(response.failed)}`
+          );
+        });
+      });
+    });
+  });
+
+  describe('broadcast', async () => {
+    describe('single notification behaviour', async () => {
+      let provider;
+
+      context('transmission succeeds', async () => {
+        beforeEach(async () => {
+          provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(Promise.resolve({ bundleId: 'abcd1234' }));
+        });
+
+        it('invokes the writer with correct `this`', async () => {
+          await provider.broadcast(notificationDouble(), 'abcd1234');
+          expect(fakes.client.write).to.be.calledOn(fakes.client);
+        });
+
+        it('writes the notification to the client once', async () => {
+          await provider.broadcast(notificationDouble(), 'abcd1234');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const bundleId = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(
+            builtNotification,
+            bundleId,
+            'broadcasts',
+            'post'
+          );
+        });
+
+        it('does not pass the array index to writer', async () => {
+          await provider.broadcast(notificationDouble(), 'abcd1234');
+          expect(fakes.client.write.firstCall.args[4]).to.be.undefined;
+        });
+
+        it('resolves with the bundleId in the sent array', async () => {
+          const result = await provider.broadcast(notificationDouble(), 'abcd1234');
+          expect(result).to.deep.equal({
+            sent: [{ bundleId: 'abcd1234' }],
+            failed: [],
+          });
+        });
+      });
+
+      context('error occurs', async () => {
+        it('resolves with the bundleId, status code and response in the failed array', async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(
+            Promise.resolve({
+              bundleId: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          const result = await provider.broadcast(notificationDouble(), 'abcd1234');
+
+          expect(result).to.deep.equal({
+            sent: [],
+            failed: [
+              { bundleId: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } },
+            ],
           });
         });
 
-        it('resolves with the device token, status code and response or error of the unsent notifications', function () {
-          return promise.then(response => {
-            expect(response.failed[3].error).to.be.an.instanceof(Error);
-            response.failed[3].error = { message: response.failed[3].error.message };
-            expect(response.failed).to.deep.equal(
-              [
-                { device: 'adfe5969', status: '400', response: { reason: 'MissingTopic' } },
-                {
-                  device: 'abcd1335',
-                  status: '410',
-                  response: { reason: 'BadDeviceToken', timestamp: 123456789 },
-                },
-                { device: 'aabbc788', status: '413', response: { reason: 'PayloadTooLarge' } },
-                { device: 'fbcde238', error: { message: 'connection failed' } },
-              ],
-              `Unexpected result: ${JSON.stringify(response.failed)}`
-            );
+        it('rejects with the bundleId, status code and response in the failed array', async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(
+            Promise.reject({
+              bundleId: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          const result = await provider.broadcast(notificationDouble(), 'abcd1234');
+
+          expect(result).to.deep.equal({
+            sent: [],
+            failed: [
+              { bundleId: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } },
+            ],
           });
+        });
+      });
+    });
+
+    context('when multiple notifications are passed', async () => {
+      beforeEach(async () => {
+        fakes.resolutions = [
+          { bundleId: 'test123', 'apns-channel-id': 'abcd1234' },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'adfe5969',
+            status: '400',
+            response: { reason: 'MissingTopic' },
+          },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'abcd1335',
+            status: '410',
+            response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+          },
+          { bundleId: 'test123', 'apns-channel-id': 'bcfe4433' },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'aabbc788',
+            status: '413',
+            response: { reason: 'PayloadTooLarge' },
+          },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'fbcde238',
+            error: new Error('connection failed'),
+          },
+        ];
+      });
+
+      context('streams are always returned', async () => {
+        let response;
+
+        beforeEach(async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          for (let i = 0; i < fakes.resolutions.length; i++) {
+            fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
+          }
+
+          response = await provider.broadcast(
+            fakes.resolutions.map(res => notificationDouble(res['apns-channel-id'])),
+            'test123'
+          );
+        });
+
+        it('resolves with the sent notifications', async () => {
+          expect(response.sent).to.deep.equal([
+            { bundleId: 'test123', 'apns-channel-id': 'abcd1234' },
+            { bundleId: 'test123', 'apns-channel-id': 'bcfe4433' },
+          ]);
+        });
+
+        it('resolves with the bundleId, status code and response or error of the unsent notifications', async () => {
+          expect(response.failed[3].error).to.be.an.instanceof(Error);
+          response.failed[3].error = { message: response.failed[3].error.message };
+          expect(response.failed).to.deep.equal(
+            [
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'adfe5969',
+                status: '400',
+                response: { reason: 'MissingTopic' },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'abcd1335',
+                status: '410',
+                response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'aabbc788',
+                status: '413',
+                response: { reason: 'PayloadTooLarge' },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'fbcde238',
+                error: { message: 'connection failed' },
+              },
+            ],
+            `Unexpected result: ${JSON.stringify(response.failed)}`
+          );
+        });
+      });
+    });
+  });
+
+  describe('manageChannels', async () => {
+    describe('single notification behaviour', async () => {
+      let provider;
+
+      context('transmission succeeds', async () => {
+        beforeEach(async () => {
+          provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(Promise.resolve({ bundleId: 'abcd1234' }));
+        });
+
+        it('invokes the writer with correct `this`', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+          expect(fakes.client.write).to.be.calledOn(fakes.client);
+        });
+
+        it('writes the notification to the client once using create', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const bundleId = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(
+            builtNotification,
+            bundleId,
+            'channels',
+            'post'
+          );
+        });
+
+        it('writes the notification to the client once using read', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'read');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const bundleId = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(
+            builtNotification,
+            bundleId,
+            'channels',
+            'get'
+          );
+        });
+
+        it('writes the notification to the client once using readAll', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'readAll');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const bundleId = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(
+            builtNotification,
+            bundleId,
+            'allChannels',
+            'get'
+          );
+        });
+
+        it('writes the notification to the client once using delete', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'delete');
+
+          const notification = notificationDouble();
+          const builtNotification = {
+            headers: notification.headers(),
+            body: notification.compile(),
+          };
+          const bundleId = 'abcd1234';
+          expect(fakes.client.write).to.be.calledOnce;
+          expect(fakes.client.write).to.be.calledWith(
+            builtNotification,
+            bundleId,
+            'channels',
+            'delete'
+          );
+        });
+
+        it('does not pass the array index to writer', async () => {
+          await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+          expect(fakes.client.write.firstCall.args[5]).to.be.undefined;
+        });
+
+        it('resolves with the bundleId in the sent array', async () => {
+          const result = await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+          expect(result).to.deep.equal({
+            sent: [{ bundleId: 'abcd1234' }],
+            failed: [],
+          });
+        });
+      });
+
+      context('error occurs', async () => {
+        it('throws error when unknown action is passed', async () => {
+          const provider = new Provider({ address: 'testapi' });
+          let receivedError;
+          try {
+            await provider.manageChannels(notificationDouble(), 'abcd1234', 'hello');
+          } catch (e) {
+            receivedError = e;
+          }
+          expect(receivedError).to.exist;
+          expect(receivedError.bundleId).to.equal('abcd1234');
+          expect(receivedError.error.message.startsWith('the action "hello"')).to.equal(true);
+        });
+
+        it('resolves with the bundleId, status code and response in the failed array', async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(
+            Promise.resolve({
+              bundleId: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          const result = await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+
+          expect(result).to.deep.equal({
+            sent: [],
+            failed: [
+              { bundleId: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } },
+            ],
+          });
+        });
+
+        it('rejects with the bundleId, status code and response in the failed array', async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          fakes.client.write.onCall(0).returns(
+            Promise.reject({
+              bundleId: 'abcd1234',
+              status: '400',
+              response: { reason: 'BadDeviceToken' },
+            })
+          );
+          const result = await provider.manageChannels(notificationDouble(), 'abcd1234', 'create');
+
+          expect(result).to.deep.equal({
+            sent: [],
+            failed: [
+              { bundleId: 'abcd1234', status: '400', response: { reason: 'BadDeviceToken' } },
+            ],
+          });
+        });
+      });
+    });
+
+    context('when multiple notifications are passed', async () => {
+      beforeEach(async () => {
+        fakes.resolutions = [
+          { bundleId: 'test123', 'apns-channel-id': 'abcd1234' },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'adfe5969',
+            status: '400',
+            response: { reason: 'MissingTopic' },
+          },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'abcd1335',
+            status: '410',
+            response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+          },
+          { bundleId: 'test123', 'apns-channel-id': 'bcfe4433' },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'aabbc788',
+            status: '413',
+            response: { reason: 'PayloadTooLarge' },
+          },
+          {
+            bundleId: 'test123',
+            'apns-channel-id': 'fbcde238',
+            error: new Error('connection failed'),
+          },
+        ];
+      });
+
+      context('streams are always returned', async () => {
+        let response;
+
+        beforeEach(async () => {
+          const provider = new Provider({ address: 'testapi' });
+
+          for (let i = 0; i < fakes.resolutions.length; i++) {
+            fakes.client.write.onCall(i).returns(Promise.resolve(fakes.resolutions[i]));
+          }
+
+          response = await provider.manageChannels(
+            fakes.resolutions.map(res => notificationDouble(res['apns-channel-id'])),
+            'test123',
+            'create'
+          );
+        });
+
+        it('resolves with the sent notifications', async () => {
+          expect(response.sent).to.deep.equal([
+            { bundleId: 'test123', 'apns-channel-id': 'abcd1234' },
+            { bundleId: 'test123', 'apns-channel-id': 'bcfe4433' },
+          ]);
+        });
+
+        it('resolves with the bundleId, status code and response or error of the unsent notifications', async () => {
+          expect(response.failed[3].error).to.be.an.instanceof(Error);
+          response.failed[3].error = { message: response.failed[3].error.message };
+          expect(response.failed).to.deep.equal(
+            [
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'adfe5969',
+                status: '400',
+                response: { reason: 'MissingTopic' },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'abcd1335',
+                status: '410',
+                response: { reason: 'BadDeviceToken', timestamp: 123456789 },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'aabbc788',
+                status: '413',
+                response: { reason: 'PayloadTooLarge' },
+              },
+              {
+                bundleId: 'test123',
+                'apns-channel-id': 'fbcde238',
+                error: { message: 'connection failed' },
+              },
+            ],
+            `Unexpected result: ${JSON.stringify(response.failed)}`
+          );
         });
       });
     });
   });
 
   describe('shutdown', function () {
-    it('invokes shutdown on the client', function () {
+    it('invokes shutdown on the client', async () => {
+      const callback = sinon.spy();
       const provider = new Provider({});
-      provider.shutdown();
+      provider.shutdown(callback);
 
-      expect(fakes.client.shutdown).to.be.calledOnce;
+      expect(fakes.client.shutdown).to.be.calledOnceWithExactly(callback);
     });
   });
 });
 
-function notificationDouble() {
+function notificationDouble(pushType = undefined) {
   return {
-    headers: sinon.stub().returns({}),
+    headers: sinon.stub().returns({ pushType: pushType }),
     payload: { aps: { badge: 1 } },
+    removeNonChannelRelatedProperties: sinon.stub(),
+    addPushTypeToPayloadIfNeeded: sinon.stub(),
     compile: function () {
       return JSON.stringify(this.payload);
     },

@@ -1,3 +1,99 @@
+## [6.4.1](https://github.com/parse-community/node-apn/compare/6.4.0...6.4.1) (2025-02-08)
+
+
+### Bug Fixes
+
+* Incorrectly attempting to send body in `GET`, `DELETE` requests ([#169](https://github.com/parse-community/node-apn/issues/169)) ([7ca2681](https://github.com/parse-community/node-apn/commit/7ca268162817dc3604eda46f9ff2433605075c9e))
+
+# [6.4.0](https://github.com/parse-community/node-apn/compare/6.3.0...6.4.0) (2025-02-06)
+
+
+### Features
+
+* Add the ability to manage channels and send broadcasts ([#164](https://github.com/parse-community/node-apn/issues/164)) ([ab234c9](https://github.com/parse-community/node-apn/commit/ab234c92a53f71b5738e7ae6ca661ac6f75d556d))
+
+# [6.3.0](https://github.com/parse-community/node-apn/compare/6.2.1...6.3.0) (2024-12-28)
+
+
+### Features
+
+* Add support for broadcast push notifications ([#163](https://github.com/parse-community/node-apn/issues/163)) ([ccd0781](https://github.com/parse-community/node-apn/commit/ccd0781d3c4f56ce8356eeca0fa050100967c6ae))
+
+## [6.2.1](https://github.com/parse-community/node-apn/compare/6.2.0...6.2.1) (2024-11-14)
+
+
+### Bug Fixes
+
+* Security upgrade jsonwebtoken from 9.0.0 to 9.0.2 ([#159](https://github.com/parse-community/node-apn/issues/159)) ([868a427](https://github.com/parse-community/node-apn/commit/868a427bfcf8e3fadf54e9b98c359edef2f57be6))
+
+# [6.2.0](https://github.com/parse-community/node-apn/compare/6.1.0...6.2.0) (2024-09-25)
+
+
+### Features
+
+* Add fields `subtitleLocKey`, `subtitleLocArgs` for localized subtitle and arguments in notifications ([#154](https://github.com/parse-community/node-apn/issues/154)) ([c885405](https://github.com/parse-community/node-apn/commit/c885405e10c9d1ec15968c42d410ce4f56dfbf04))
+
+# [6.1.0](https://github.com/parse-community/node-apn/compare/6.0.2...6.1.0) (2024-09-16)
+
+
+### Features
+
+* Add `dismissal-date` property to Live Activity notifications ([#152](https://github.com/parse-community/node-apn/issues/152)) ([d863f2e](https://github.com/parse-community/node-apn/commit/d863f2e6ce2a58ee92371d69ad8966dd9927e90f))
+
+## [6.0.2](https://github.com/parse-community/node-apn/compare/6.0.1...6.0.2) (2024-09-10)
+
+
+### Bug Fixes
+
+* Incorrect field name `events` instead of `event` in Live Activity push notification payload ([#148](https://github.com/parse-community/node-apn/issues/148)) ([5876a59](https://github.com/parse-community/node-apn/commit/5876a59fcd04c53ccd85ae8ea06a51e2cf119993))
+
+## [6.0.1](https://github.com/parse-community/node-apn/compare/6.0.0...6.0.1) (2023-10-20)
+
+
+### Bug Fixes
+
+* Minimum required Node version in `engines.node` has not been upgraded to Node 14 ([#138](https://github.com/parse-community/node-apn/issues/138)) ([4eb3686](https://github.com/parse-community/node-apn/commit/4eb3686e30c225d8d83c55cf7a5f11bc807a9ef4))
+
+# [6.0.0](https://github.com/parse-community/node-apn/compare/5.2.3...6.0.0) (2023-10-19)
+
+
+### Features
+
+* Add support for Node 18, 20 drop support for Node 12 ([#137](https://github.com/parse-community/node-apn/issues/137)) ([f203bc1](https://github.com/parse-community/node-apn/commit/f203bc1c6d1e72a5b0689368220ec109d347003a))
+
+
+### BREAKING CHANGES
+
+* This release removes support for Node 12; the minimum required version is Node 14. ([f203bc1](f203bc1))
+
+## [5.2.3](https://github.com/parse-community/node-apn/compare/5.2.2...5.2.3) (2023-07-21)
+
+
+### Bug Fixes
+
+* Incorrect field name `event` instead of `events` in Live Activity push notification payload ([#133](https://github.com/parse-community/node-apn/issues/133)) ([a25c835](https://github.com/parse-community/node-apn/commit/a25c835d220a6d37101eeaedaec78e1fb0028696))
+
+## [5.2.2](https://github.com/parse-community/node-apn/compare/5.2.1...5.2.2) (2023-07-20)
+
+
+### Bug Fixes
+
+* Shutdown callback is not passed from provider to client ([#118](https://github.com/parse-community/node-apn/issues/118)) ([9fa197f](https://github.com/parse-community/node-apn/commit/9fa197fd92da5a56f5bdaf7d8df8dab6e85af0d1))
+
+## [5.2.1](https://github.com/parse-community/node-apn/compare/5.2.0...5.2.1) (2023-07-16)
+
+
+### Bug Fixes
+
+* Security upgrade jsonwebtoken from 8.5.1 to 9.0.0 ([#128](https://github.com/parse-community/node-apn/issues/128)) ([5bc179d](https://github.com/parse-community/node-apn/commit/5bc179dfe621fe3e225bcdffb98bc913c5745a0b))
+
+# [5.2.0](https://github.com/parse-community/node-apn/compare/5.1.3...5.2.0) (2023-07-16)
+
+
+### Features
+
+* Add support for Live Activity with ActivityKit push notifications ([#130](https://github.com/parse-community/node-apn/issues/130)) ([80717cd](https://github.com/parse-community/node-apn/commit/80717cd6c3a3341c90d3a6ea73fe64c663de8c8a))
+
 ## [5.1.3](https://github.com/parse-community/node-apn/compare/5.1.2...5.1.3) (2022-03-27)
 
 

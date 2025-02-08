@@ -2,7 +2,7 @@ module.exports = function () {
   // Mocks of public API methods
   function Client() {}
 
-  Client.prototype.write = function mockWrite(notification, device) {
+  Client.prototype.write = function mockWrite(notification, device, type, method = 'post') {
     return { device };
   };
 

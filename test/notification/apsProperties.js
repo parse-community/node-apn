@@ -261,6 +261,7 @@ describe('Notification', function () {
         });
       });
     });
+
     describe('titleLocKey', function () {
       it('sets the aps.alert.title-loc-key property', function () {
         note.titleLocKey = 'Warning';
@@ -349,6 +350,111 @@ describe('Notification', function () {
         it('sets the aps.alert.title-loc-args property', function () {
           expect(compiledOutput())
             .to.have.nested.deep.property('aps.alert.title-loc-args')
+            .that.deep.equals(['Hi there']);
+        });
+      });
+
+      describe('setTitleLocArgs', function () {
+        it('is chainable', function () {
+          expect(note.setTitleLocArgs(['iPhone 6s'])).to.equal(note);
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert.title-loc-args')
+            .that.deep.equals(['iPhone 6s']);
+        });
+      });
+    });
+
+    describe('subtitleLocKey', function () {
+      it('sets the aps.alert.subtitle-loc-key property', function () {
+        note.subtitleLocKey = 'Warning';
+        expect(compiledOutput()).to.have.nested.deep.property(
+          'aps.alert.subtitle-loc-key',
+          'Warning'
+        );
+      });
+
+      context('alert is already an object', function () {
+        beforeEach(function () {
+          note.alert = { body: 'Test', 'launch-image': 'test.png' };
+          note.subtitleLocKey = 'Warning';
+        });
+
+        it('contains all expected properties', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert').that.deep.equals({
+            body: 'Test',
+            'launch-image': 'test.png',
+            'subtitle-loc-key': 'Warning',
+          });
+        });
+      });
+
+      context('alert is already a string', function () {
+        beforeEach(function () {
+          note.alert = 'Hello, world';
+          note.subtitleLocKey = 'Warning';
+        });
+
+        it('retains the alert body correctly', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.body', 'Hello, world');
+        });
+
+        it('sets the aps.alert.subtitle-loc-key property', function () {
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.subtitle-loc-key',
+            'Warning'
+          );
+        });
+      });
+
+      describe('setAlert', function () {
+        it('is chainable', function () {
+          expect(note.setSubtitleLocKey('greeting')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.deep.property(
+            'aps.alert.subtitle-loc-key',
+            'greeting'
+          );
+        });
+      });
+    });
+
+    describe('subtitleLocArgs', function () {
+      it('sets the aps.alert.subtitle-loc-args property', function () {
+        note.subtitleLocArgs = ['arg1', 'arg2'];
+        expect(compiledOutput())
+          .to.have.nested.deep.property('aps.alert.subtitle-loc-args')
+          .that.deep.equals(['arg1', 'arg2']);
+      });
+
+      context('alert is already an object', function () {
+        beforeEach(function () {
+          note.alert = { body: 'Test', 'launch-image': 'test.png' };
+          note.subtitleLocArgs = ['Hi there'];
+        });
+
+        it('contains all expected properties', function () {
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert')
+            .that.deep.equals({
+              body: 'Test',
+              'launch-image': 'test.png',
+              'subtitle-loc-args': ['Hi there'],
+            });
+        });
+      });
+
+      context('alert is already a string', function () {
+        beforeEach(function () {
+          note.alert = 'Hello, world';
+          note.subtitleLocArgs = ['Hi there'];
+        });
+
+        it('retains the alert body', function () {
+          expect(compiledOutput()).to.have.nested.deep.property('aps.alert.body', 'Hello, world');
+        });
+
+        it('sets the aps.alert.subtitle-loc-args property', function () {
+          expect(compiledOutput())
+            .to.have.nested.deep.property('aps.alert.subtitle-loc-args')
             .that.deep.equals(['Hi there']);
         });
       });
@@ -828,6 +934,167 @@ describe('Notification', function () {
             'aps.interruption-level',
             'the-interruption-level'
           );
+        });
+      });
+    });
+
+    describe('event', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+      });
+
+      it('can be set to a string', function () {
+        note.event = 'the-event';
+
+        expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+      });
+
+      it('can be set to undefined', function () {
+        note.event = 'the-event';
+        note.event = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.event');
+      });
+
+      describe('setEvent', function () {
+        it('is chainable', function () {
+          expect(note.setEvent('the-event')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.event', 'the-event');
+        });
+      });
+    });
+
+    describe('dismissal-date', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
+      });
+
+      it('can be set to a number', function () {
+        note.dismissalDate = 123456;
+
+        expect(compiledOutput()).to.have.nested.property('aps.dismissal-date', 123456);
+      });
+
+      it('can be set to undefined', function () {
+        note.dismissalDate = 123456;
+        note.dismissalDate = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.dismissal-date');
+      });
+
+      describe('setDismissalDate', function () {
+        it('is chainable', function () {
+          expect(note.setDismissalDate(123456)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.dismissal-date', 123456);
+        });
+      });
+    });
+
+    describe('timestamp', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.timestamp');
+      });
+
+      it('can be set to a number', function () {
+        note.timestamp = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.timestamp', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.timestamp = 1234;
+        note.timestamp = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.timestamp');
+      });
+
+      describe('setTimestamp', function () {
+        it('is chainable', function () {
+          expect(note.setTimestamp(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.timestamp', 1234);
+        });
+      });
+    });
+
+    describe('relevance-score', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.relevance-score');
+      });
+
+      it('can be set to a number', function () {
+        note.relevanceScore = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.relevance-score', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.relevanceScore = 1234;
+        note.relevanceScore = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.relevance-score');
+      });
+
+      describe('setRelevanceScore', function () {
+        it('is chainable', function () {
+          expect(note.setRelevanceScore(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.relevance-score', 1234);
+        });
+      });
+    });
+
+    describe('stale-date', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.stale-date');
+      });
+
+      it('can be set to a number', function () {
+        note.staleDate = 1234;
+
+        expect(compiledOutput()).to.have.nested.property('aps.stale-date', 1234);
+      });
+
+      it('can be set to undefined', function () {
+        note.staleDate = 1234;
+        note.staleDate = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.stale-date');
+      });
+
+      describe('setStaleDate', function () {
+        it('is chainable', function () {
+          expect(note.setStaleDate(1234)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.stale-date', 1234);
+        });
+      });
+    });
+
+    describe('content-state', function () {
+      const payload = { foo: 'bar' };
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.content-state');
+      });
+
+      it('can be set to a object', function () {
+        note.contentState = payload;
+
+        expect(compiledOutput())
+          .to.have.nested.property('aps.content-state')
+          .that.deep.equals(payload);
+      });
+
+      it('can be set to undefined', function () {
+        note.contentState = payload;
+        note.contentState = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.content-state');
+      });
+
+      describe('setContentState', function () {
+        it('is chainable', function () {
+          expect(note.setContentState(payload)).to.equal(note);
+          expect(compiledOutput())
+            .to.have.nested.property('aps.content-state')
+            .that.deep.equals(payload);
         });
       });
     });

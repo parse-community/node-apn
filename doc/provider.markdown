@@ -13,9 +13,9 @@ Options:
 
  - `key` {Buffer|String} The filename of the connection key to load from disk, or a Buffer/String containing the key data. (Defaults to: `key.pem`)
 
- - `ca` An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048).
+ - `ca` An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048)
 
- - `pfx` {Buffer|String} File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above.
+ - `pfx` {Buffer|String} File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above
 
  - `passphrase` {String} The passphrase for the connection key, if required
 
@@ -23,7 +23,23 @@ Options:
 
  - `rejectUnauthorized` {Boolean} Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
 
+ - `address` {String} The address of the APNs server to send notifications to. If not provided, will connect to standard APNs server
+
+- `port` {Number} The port of the APNs server to send notifications to. (Defaults to 443)
+
+ - `manageChannelsAddress` {String} The address of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management server
+
+ - `manageChannelsPort` {Number} The port of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management port
+
+ - `proxy` {host: String, port: Number|String} Connect through an HTTP proxy when sending notifications
+
+ - `manageChannelsProxy` {host: String, port: Number|String} Connect through an HTTP proxy when managing channels
+
+ - `rejectUnauthorized` {Boolean} Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
+
  - `connectionRetryLimit` {Number} The maximum number of connection failures that will be tolerated before `apn.Provider` will "give up". [See below.](#connection-retry-limit) (Defaults to: 3)
+
+ - `heartBeat` {Number} The delay interval in ms that apn will ping APNs servers. (Defaults to: 60000)
 
 - `requestTimeout` {Number} The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
 
@@ -47,31 +63,54 @@ The `Provider` can continue to be used for sending notifications and the counter
 
 ## Class: apn.Provider
 
+`apn.Provider` provides a number of methods for sending notifications, broadcasting notifications, and managing channels. Calling any of the methods will return a `Promise` for each notification, which is discussed more in [Results from APN Provider Methods](#results-from-apnprovider-methods).
+
 ### connection.send(notification, recipients)
 
-This is main interface for sending notifications. Create a `Notification` object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+This is the main interface for sending notifications. Create a `Notification` object and pass it in, along with a single recipient or an array of them, and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
 
 > A "recipient" is a `String` containing the hex-encoded device token.
 
-Calling `send` will return a `Promise`. The Promise will resolve after each notification (per token) has reached a final state. Each notification can end in one of three possible states:
+Calling `send` will return a `Promise`. The Promise will resolve after each notification (per token) has reached a final state.
+
+### connection.manageChannels(notification, bundleId, action)
+This is the interface for managing broadcast channels. Create a single `Notification` object or an array of them and pass the notification(s) in, along with a bundleId, and an action (`create`, `read`, `readAll`, `delete`) and node-apn will take care of the rest, asking the APNs to perform the action using the criteria specified in each notification.
+
+> A "bundleId" is a `String` containing the bundle identifier for the application.
+
+> An "action" is a `String` containing: `create`, `read`, `readAll`, or `delete` and represents what action to perform with a channel (See more in [Apple Documentation](https://developer.apple.com/documentation/usernotifications/sending-channel-management-requests-to-apns)).
+
+Calling `manageChannels` will return a `Promise`. The Promise will resolve after each notification has reached a final state.
+
+### connection.broadcast(notification, bundleId)
+
+This is the interface for broadcasting Live Activity notifications. Create a single `Notification` object or an array of them and pass the notification(s) in, along with a bundleId and node-apn will take care of the rest, asking the APNs to broadcast using the criteria specified in each notification.
+
+> A "bundleId" is a `String` containing the bundle identifier for the application.
+
+Calling `broadcast` will return a `Promise`. The Promise will resolve after each notification has reached a final state.
+
+### Results from apn.Provider methods
+
+ Each notification can end in one of three possible states:
 
   - `sent` - the notification was accepted by Apple for delivery to the given recipient
-  - `failed` (rejected) - the notification was rejected by Apple. A rejection has an associated `status` and `reason` which is included.
-  - `failed` (error) - a connection-level error occurred which prevented successful communication with Apple. In very rare cases it's possible that the notification was still delivered. However, this state usually results from a network problem.
+  - `failed` (rejected) - the notification was rejected by Apple. A rejection has an associated `status` and `reason` which are included.
+  - `failed` (error) - a connection-level error occurred, which prevented successful communication with Apple. In very rare cases, it's possible that the notification was still delivered. However, this state usually results from a network problem.
 
 When the returned `Promise` resolves, its value will be an Object containing two properties
 
 #### sent
 
-An array of device tokens to which the notification was successfully sent and accepted by Apple.
+An array of device tokens or bundle identifiers to which the notification was successfully sent and accepted by Apple.
 
-Being `sent` does **not** guaranteed the notification will be _delivered_, other unpredictable factors - including whether the device is reachable - can ultimately prevent delivery.
+Being `sent` does **not** guarantee the notification will be _delivered_, other unpredictable factors - including whether the device is reachable - can ultimately prevent delivery.
 
 #### failed
 
-An array of objects for each failed token. Each object will contain the device token which failed and details of the failure which will differ between rejected and errored notifications.
+An array of objects for each failed token or bundle identifier. Each object will contain the device token or bundle identifier that failed and details of the failure, which will differ between rejected and errored notifications.
 
-For **rejected** notifications the object will take the following form
+For **rejected** notifications using `send()`, the object will take the following form
 
 ```javascript
 {
@@ -85,7 +124,7 @@ For **rejected** notifications the object will take the following form
 
 More details about the response and associated status codes can be found in the [HTTP/2 Response from APN documentation][http2-response].
 
-If a failed notification was instead caused by an **error** then it will have an `error` property instead of `response` and `status`:
+If a failed notification using `send()` was instead caused by an **error** then it will have an `error` property instead of `response` and `status`:
 
 ```javascript
 {
@@ -103,7 +142,7 @@ If you wish to send notifications containing emoji or other multi-byte character
 
 Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
 
-**Note:** If notifications are pushed after the connection has started, an error will be thrown.
+**Note:** If notifications are pushed after the shutdown has started, an error will be thrown.
 
 [provider-api]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html
 [provider-auth-tokens]: https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html#//apple_ref/doc/uid/TP40008194-CH11-SW1

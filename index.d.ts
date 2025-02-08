@@ -31,11 +31,11 @@ export interface ProviderOptions {
    */
   key?: string|Buffer;
   /**
-   * An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048).
+   * An array of trusted certificates. Each element should contain either a filename to load, or a Buffer/String (in PEM format) to be used directly. If this is omitted several well known "root" CAs will be used. - You may need to use this as some environments don't include the CA used by Apple (entrust_2048)
    */
   ca?: (string|Buffer)[];
   /**
-   * File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above.
+   * File path for private key, certificate and CA certs in PFX or PKCS12 format, or a Buffer containing the PFX data. If supplied will always be used instead of certificate and key above
    */
   pfx?: string|Buffer;
   /**
@@ -47,6 +47,30 @@ export interface ProviderOptions {
    */
   production?: boolean;
   /**
+   * The address of the APNs server to send notifications to. If not provided, will connect to standard APNs server
+   */
+  address?: string;
+  /**
+   * The port of the APNs server to send notifications to. (Defaults to 443)
+   */
+  port?: number;
+  /**
+   * The address of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management server
+   */
+  manageChannelsAddress?: string;
+  /**
+   * The port of the APNs channel management server to send notifications to. If not provided, will connect to standard APNs channel management port
+   */
+  manageChannelsPort?: number;
+  /**
+   * Connect through an HTTP proxy when sending notifications
+   */
+  proxy?: { host: string, port: number|string }
+  /**
+   * Connect through an HTTP proxy when managing channels
+   */
+  manageChannelsProxy?: { host: string, port: number|string }
+  /**
    * Reject Unauthorized property to be passed through to tls.connect() (Defaults to `true`)
    */
   rejectUnauthorized?: boolean;
@@ -55,13 +79,13 @@ export interface ProviderOptions {
    */
   connectionRetryLimit?: number;
   /**
+   * The delay interval in ms that apn will ping APNs servers. (Defaults to: 60000)
+   */
+  heartBeat?: number;
+  /**
    * The maximum time in ms that apn will wait for a response to a request. (Defaults to: 5000)
    */
   requestTimeout?: number;
-  /**
-   * Connect through an HTTP proxy
-   */
-  proxy?: { host: string, port: number|string }
 }
 
 export interface MultiProviderOptions extends ProviderOptions {
@@ -78,6 +102,8 @@ interface ApsAlert {
   title?: string
   "title-loc-key"?: string
   "title-loc-args"?: any[]
+  "subtitle-loc-key"?: string
+  "subtitle-loc-args"?: any[]
   action?: string
   "action-loc-key"?: string
 }
@@ -97,11 +123,35 @@ interface Aps {
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
   category?: string
+  "thread-id"?: string
+  "target-content-id"?: string 
+  "interruption-level"?: string | ApsNotificationInterruptionLevel
+  "relevance-score"?: number
+  "filter-criteria"?: string
+  "stale-date"?: number
+  "content-state"?: Object
+  timestamp?: number
+  event?: string
+  "dismissal-date"?: number
+  "attributes-type"?: string
+  attributes?: Object
 }
 
 export interface ResponseSent {
   device: string;
 }
+
+export interface BroadcastResponse {
+  bundleId: string;
+  "apns-request-id"?: string;
+  "apns-channel-id"?: string;
+  "message-storage-policy"?: number;
+  "push-type"?: string;
+  "channels"?: string[];
+}
+
+export interface LoggerResponse extends Partial<ResponseSent>, Partial<BroadcastResponse> {}
+
 export interface ResponseFailure {
   device: string;
   error?: Error;
@@ -112,60 +162,114 @@ export interface ResponseFailure {
   };
 }
 
-export interface Responses {
-  sent:   ResponseSent[];
-  failed: ResponseFailure[];
+export interface BroadcastResponseFailure extends Omit<ResponseFailure, "device"> {
+  bundleId: string;
+}
+
+export interface LoggerResponseFailure extends Partial<ResponseFailure>, Partial<BroadcastResponseFailure> {}
+
+export interface Responses<R,F> {
+  sent: R[];
+  failed: F[];
 }
 
 export class Provider extends EventEmitter {
   constructor(options: ProviderOptions);
   /**
-   * This is main interface for sending notifications. Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+   * This is main interface for sending notifications.
+   *  
+   * @remarks
+   * Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
    *
-   * A "recipient" is a String containing the hex-encoded device token.
+   * @param notification - The notification to send.
+   * @param recipients - A String or an Array of Strings containing the hex-encoded device token.
    */
-  send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+  send(notification: Notification, recipients: string|string[]): Promise<Responses<ResponseSent,ResponseFailure>>;
+
+  /**
+   * Manage channels using a specific action.
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId - The bundleId for your application.
+   * @param action - Specifies the action to perform on the channel(s).
+   */
+  manageChannels(notifications: Notification|Notification[], bundleId: string, action: ChannelAction): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
+
+  /**
+   * Broadcast notificaitons to channel(s).
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId: The bundleId for your application.
+   */
+  broadcast(notifications: Notification|Notification[], bundleId: string): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
 
   /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
+   * @remarks
    * In order to log, these functions must have a property '.enabled' that is true.
    * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
-  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses<LoggerResponse,LoggerResponseFailure>>;
 
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
-  shutdown(callback?: () => void): void;
+  shutdown(callback?: () => void): Promise<void>;
 }
 
 export class MultiProvider extends EventEmitter {
   constructor(options: MultiProviderOptions);
   /**
-   * This is main interface for sending notifications. Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
+   * This is main interface for sending notifications.
+   *  
+   * @remarks
+   * Create a Notification object and pass it in, along with a single recipient or an array of them and node-apn will take care of the rest, delivering a copy of the notification to each recipient.
    *
-   * A "recipient" is a String containing the hex-encoded device token.
+   * @param notification - The notification to send.
+   * @param recipients - A String or an Array of Strings containing the hex-encoded device token.
    */
-  send(notification: Notification, recipients: string|string[]): Promise<Responses>;
+  send(notification: Notification, recipients: string|string[]): Promise<Responses<ResponseSent,ResponseFailure>>;
+
+  /**
+   * Manage channels using a specific action.
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId - The bundleId for your application.
+   * @param action - Specifies the action to perform on the channel(s).
+   */
+  manageChannels(notifications: Notification|Notification[], bundleId: string, action: ChannelAction): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
+
+  /**
+   * Broadcast notificaitons to channel(s).
+   *
+   * @param notifications - A Notification or an Array of Notifications to send. Each notification should specify the respective channelId it's directed to.
+   * @param bundleId: The bundleId for your application.
+   */
+  broadcast(notifications: Notification|Notification[], bundleId: string): Promise<Responses<BroadcastResponse,BroadcastResponseFailure>>;
 
   /**
    * Set an info logger, and optionally an errorLogger to separately log errors.
    *
+   * @remarks
    * In order to log, these functions must have a property '.enabled' that is true.
-   * (The default logger uses the npm 'debug' module which sets '.enabled' 
+   * (The default logger uses the npm 'debug' module which sets '.enabled'
    * based on the DEBUG environment variable)
    */
-  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses>;
+  setLogger(logger: (msg: string) => void, errorLogger?: (msg: string) => void): Promise<Responses<LoggerResponse,LoggerResponseFailure>>;
 
   /**
    * Indicate to node-apn that it should close all open connections when the queue of pending notifications is fully drained. This will allow your application to terminate.
    */
-  shutdown(callback?: () => void): void;
+  shutdown(callback?: () => void): Promise<void>;
 }
 
-export type NotificationPushType = 'background' | 'alert' | 'voip';
+export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
+
+export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
+
+export type ApsNotificationInterruptionLevel = 'passive' | 'active' | 'time-sensitive' | 'critical';
 
 export interface NotificationAlertOptions {
   title?: string;
@@ -173,6 +277,8 @@ export interface NotificationAlertOptions {
   body: string;
   "title-loc-key"?: string;
   "title-loc-args"?: string[];
+  "subtitle-loc-key"?: string;
+  "subtitle-loc-args"?: string[];
   "action-loc-key"?: string;
   "loc-key"?: string;
   "loc-args"?: string[];
@@ -194,6 +300,19 @@ export class Notification {
    */
   public id: string;
   /**
+   * A UUID to identify this request.
+   */
+  public requestId: string;
+  /**
+   * A base64-encoded string that identifies the channel to publish the payload.
+     The channel ID is generated by sending channel creation request to APNs.
+   */
+  public channelId: string;
+  /**
+   * Multiple notifications with same collapse identifier are displayed to the user as a single notification. The value should not exceed 64 bytes.
+   */
+  public collapseId: string;
+  /**
    * The UNIX timestamp representing when the notification should expire. This does not contribute to the 2048 byte payload size limit. An expiry of 0 indicates that the notification expires immediately.
    */
   public expiry: number;
@@ -205,9 +324,13 @@ export class Notification {
    * - 5 - The push message is sent at a time that conserves power on the device receiving it.
    */
   public priority: number;
-
-  public collapseId: string;
+  /**
+   * The type of the notification.
+   */
   public pushType: NotificationPushType;
+  /**
+   * An app-specific identifier for grouping related notifications.
+   */
   public threadId: string;
 
   /**
