@@ -161,7 +161,7 @@ describe('Notification', function () {
   });
 
   describe('headers', function () {
-    it('contains only thr priority property by default', function () {
+    it('contains only the priority property by default', function () {
       expect(note.headers()).to.deep.equal({ "apns-priority": 10 });
     });
 
