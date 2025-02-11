@@ -191,8 +191,8 @@ Provide one of the following values:
 
   * `10` - The push notification is sent to the device immediately. (Default)
     > The push notification must trigger an alert, sound, or badge on the device. It is an error to use this priority for a push notification that contains only the `content-available` key.
-  * `5` - The push message is sent at a time that conserves power on the device receiving it.
-  * `1` - The push message is sent at a time to prioritize the device’s power considerations over all other factors for delivery, and prevent awakening the device.
+  * `5` - The push notification is sent at a time that conserves power on the device receiving it.
+  * `1` - The push notification is sent at a time to prioritize the device’s power considerations over all other factors for delivery, and prevent awakening the device.
 
 
 #### notification.pushType
