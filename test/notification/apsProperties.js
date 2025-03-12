@@ -1099,6 +1099,64 @@ describe('Notification', function () {
       });
     });
 
+    describe('input-push-token', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.input-push-token');
+      });
+
+      it('can be set to a number', function () {
+        note.inputPushToken = 1;
+
+        expect(compiledOutput()).to.have.nested.property('aps.input-push-token', 1);
+      });
+
+      it('can be set to undefined', function () {
+        note.inputPushToken = 1;
+        note.inputPushToken = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.input-push-token');
+      });
+
+      describe('setInputPushToken', function () {
+        it('is chainable', function () {
+          expect(note.setDismissalDate(1)).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property('aps.input-push-token', 1);
+        });
+      });
+    });
+
+    describe('filter-criteria', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.filter-criteria');
+      });
+
+      it('can be set to a string', function () {
+        note.filterCriteria = 'the-filter-criteria';
+
+        expect(compiledOutput()).to.have.nested.property(
+          'aps.interruption-level',
+          'the-interruption-level'
+        );
+      });
+
+      it('can be set to undefined', function () {
+        note.filterCriteria = 'filter-criteria';
+        note.filterCriteria = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.filter-criteria');
+      });
+
+      describe('setfilterCriteria', function () {
+        it('is chainable', function () {
+          expect(note.setß('the-filter-criteria')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property(
+            'aps.filter-criteria',
+            'the-filter-criteria'
+          );
+        });
+      });
+    });
+
     context('when no aps properties are set', function () {
       it('is not present', function () {
         expect(compiledOutput().aps).to.be.undefined;

@@ -133,6 +133,8 @@ interface Aps {
   timestamp?: number
   event?: string
   "dismissal-date"?: number
+  "input-push-channel": string
+  "input-push-token": number
   "attributes-type"?: string
   attributes?: Object
 }
