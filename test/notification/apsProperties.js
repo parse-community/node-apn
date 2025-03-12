@@ -1221,6 +1221,37 @@ describe('Notification', function () {
       });
     });
 
+    describe('attributes', function () {
+      const payload = { foo: 'bar' };
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.attributes');
+      });
+
+      it('can be set to a object', function () {
+        note.attributes = payload;
+
+        expect(compiledOutput())
+          .to.have.nested.property('aps.attributes')
+          .that.deep.equals(payload);
+      });
+
+      it('can be set to undefined', function () {
+        note.attributes = payload;
+        note.attributes = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.attributes');
+      });
+
+      describe('setAttributes', function () {
+        it('is chainable', function () {
+          expect(note.setAttributes(payload)).to.equal(note);
+          expect(compiledOutput())
+            .to.have.nested.property('aps.attributes')
+            .that.deep.equals(payload);
+        });
+      });
+    });
+
     context('when no aps properties are set', function () {
       it('is not present', function () {
         expect(compiledOutput().aps).to.be.undefined;
