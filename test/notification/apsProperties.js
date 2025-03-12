@@ -1099,6 +1099,38 @@ describe('Notification', function () {
       });
     });
 
+    describe('input-push-channel', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.input-push-channel');
+      });
+
+      it('can be set to a string', function () {
+        note.inputPushChannel = 'the-input-push-channel';
+
+        expect(compiledOutput()).to.have.nested.property(
+          'aps.input-push-channel',
+          'the-input-push-channel'
+        );
+      });
+
+      it('can be set to undefined', function () {
+        note.inputPushChannel = 'input-push-channel';
+        note.inputPushChannel = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.input-push-channel');
+      });
+
+      describe('setInputPushChannel', function () {
+        it('is chainable', function () {
+          expect(note.setInputPushChannel('the-input-push-channel')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property(
+            'aps.input-push-channel',
+            'the-input-push-channel'
+          );
+        });
+      });
+    });
+
     describe('input-push-token', function () {
       it('defaults to undefined', function () {
         expect(compiledOutput()).to.not.have.nested.property('aps.input-push-token');
@@ -1119,7 +1151,7 @@ describe('Notification', function () {
 
       describe('setInputPushToken', function () {
         it('is chainable', function () {
-          expect(note.setDismissalDate(1)).to.equal(note);
+          expect(note.setInputPushToken(1)).to.equal(note);
           expect(compiledOutput()).to.have.nested.property('aps.input-push-token', 1);
         });
       });
@@ -1134,8 +1166,8 @@ describe('Notification', function () {
         note.filterCriteria = 'the-filter-criteria';
 
         expect(compiledOutput()).to.have.nested.property(
-          'aps.interruption-level',
-          'the-interruption-level'
+          'aps.filter-criteria',
+          'the-filter-criteria'
         );
       });
 
@@ -1146,12 +1178,44 @@ describe('Notification', function () {
         expect(compiledOutput()).to.not.have.nested.property('aps.filter-criteria');
       });
 
-      describe('setfilterCriteria', function () {
+      describe('setFilterCriteria', function () {
         it('is chainable', function () {
-          expect(note.setß('the-filter-criteria')).to.equal(note);
+          expect(note.setFilterCriteria('the-filter-criteria')).to.equal(note);
           expect(compiledOutput()).to.have.nested.property(
             'aps.filter-criteria',
             'the-filter-criteria'
+          );
+        });
+      });
+    });
+
+    describe('attributes-type', function () {
+      it('defaults to undefined', function () {
+        expect(compiledOutput()).to.not.have.nested.property('aps.attributes-type');
+      });
+
+      it('can be set to a string', function () {
+        note.attributesType = 'the-attributes-type';
+
+        expect(compiledOutput()).to.have.nested.property(
+          'aps.attributes-type',
+          'the-attributes-type'
+        );
+      });
+
+      it('can be set to undefined', function () {
+        note.attributesType = 'attributes-type';
+        note.attributesType = undefined;
+
+        expect(compiledOutput()).to.not.have.nested.property('aps.attributes-type');
+      });
+
+      describe('setAttributesType', function () {
+        it('is chainable', function () {
+          expect(note.setAttributesType('the-attributes-type')).to.equal(note);
+          expect(compiledOutput()).to.have.nested.property(
+            'aps.attributes-type',
+            'the-attributes-type'
           );
         });
       });
