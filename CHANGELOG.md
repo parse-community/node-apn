@@ -1,3 +1,10 @@
+## [6.4.3](https://github.com/parse-community/node-apn/compare/6.4.2...6.4.3) (2025-02-11)
+
+
+### Bug Fixes
+
+* Does not allow sending the priority of 10 for notifications ([#173](https://github.com/parse-community/node-apn/issues/173)) ([689ce37](https://github.com/parse-community/node-apn/commit/689ce3734dcd5170ac7e16bb67f73551de6a6b74))
+
 ## [6.4.2](https://github.com/parse-community/node-apn/compare/6.4.1...6.4.2) (2025-02-08)
 
 

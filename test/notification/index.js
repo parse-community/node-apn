@@ -154,14 +154,15 @@ describe('Notification', function () {
       expect(note.headers()).to.deep.equal({
         'apns-channel-id': 'io.apn.channel',
         'apns-expiration': 1000,
+        "apns-priority": 10,
         'apns-request-id': 'io.apn.request',
       });
     });
   });
 
   describe('headers', function () {
-    it('contains no properties by default', function () {
-      expect(note.headers()).to.deep.equal({});
+    it('contains only the priority property by default', function () {
+      expect(note.headers()).to.deep.equal({ "apns-priority": 10 });
     });
 
     context('priority is non-default', function () {
