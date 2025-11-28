@@ -17,6 +17,8 @@ jobs:
             NODE_VERSION: 20
           - name: Node.js 22
             NODE_VERSION: 22
+          - name: Node.js 24
+            NODE_VERSION: 24
       fail-fast: false
     name: ${{ matrix.name }}
     runs-on: ubuntu-latest
