@@ -267,7 +267,7 @@ export class MultiProvider extends EventEmitter {
   shutdown(callback?: () => void): Promise<void>;
 }
 
-export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
+export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm' | 'widgets';
 
 export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
 
