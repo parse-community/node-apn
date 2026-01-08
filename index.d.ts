@@ -120,6 +120,7 @@ interface Aps {
   badge?: number
   sound?: string | ApsSound
   "content-available"?: undefined | 1
+  "content-changed"?: undefined | true
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
   category?: string
