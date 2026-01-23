@@ -46,8 +46,7 @@ describe('parseCredentials', function () {
         fakes.parsePkcs12
           .withArgs('encryptedPfxData', 'apntest')
           .returns({ key: pfxKey, certificates: [pfxCert] });
-        fakes.parsePkcs12
-          .throws(new Error('unable to read credentials, incorrect passphrase'));
+        fakes.parsePkcs12.throws(new Error('unable to read credentials, incorrect passphrase'));
       });
 
       it('returns the parsed key', function () {
