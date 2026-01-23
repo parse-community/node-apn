@@ -2,8 +2,8 @@
  * Semantic Release Config
  */
 
-const fs = require('fs').promises;
-const path = require('path');
+const { readFile } = require('fs').promises;
+const { resolve } = require('path');
 
 // Get env vars
 const ref = process.env.GITHUB_REF;
@@ -24,12 +24,14 @@ const templates = {
 async function config() {
 
   // Get branch
-  const branch = ref.split('/').pop();
+  const branch = ref?.split('/')?.pop() || '(current branch could not be determined)';
+  // eslint-disable-next-line no-console
   console.log(`Running on branch: ${branch}`);
 
   // Set changelog file
   //const changelogFile = `./changelogs/CHANGELOG_${branch}.md`;
   const changelogFile = `./CHANGELOG.md`;
+  // eslint-disable-next-line no-console
   console.log(`Changelog file output to: ${changelogFile}`);
 
   // Load template file contents
@@ -59,13 +61,13 @@ async function config() {
           { scope: 'no-release', release: false },
         ],
         parserOpts: {
-          noteKeywords: [ 'BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING' ],
+          noteKeywords: ['BREAKING CHANGE'],
         },
       }],
       ['@semantic-release/release-notes-generator', {
         preset: 'angular',
         parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES', 'BREAKING']
+          noteKeywords: ['BREAKING CHANGE']
         },
         writerOpts: {
           commitsSort: ['subject', 'scope'],
@@ -87,7 +89,7 @@ async function config() {
       ['@semantic-release/github', {
         successComment: getReleaseComment(),
         labels: ['type:ci'],
-        releasedLabels: ['state:released<%= nextRelease.channel ? `-${nextRelease.channel}` : "" %>']
+        releasedLabels: ['state:released<%= nextRelease.channel ? `-\${nextRelease.channel}` : "" %>']
       }],
     ],
   };
@@ -97,13 +99,10 @@ async function config() {
 
 async function loadTemplates() {
   for (const template of Object.keys(templates)) {
-    const text = await readFile(path.resolve(__dirname, resourcePath, templates[template].file));
+    const filePath = resolve(__dirname, resourcePath, templates[template].file);
+    const text = await readFile(filePath, 'utf-8');
     templates[template].text = text;
   }
-}
-
-async function readFile(filePath) {
-  return await fs.readFile(filePath, 'utf-8');
 }
 
 function getReleaseComment() {
