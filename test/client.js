@@ -356,6 +356,27 @@ describe('Client', () => {
     expect(errorMessages).to.be.empty;
   });
 
+  it('Returns APNs notification ID in responses', async () => {
+    const notificationId = '7dc35f9f-58d4-40dd-8c08-38ab811f57df';
+
+    server = createAndStartMockServer(TEST_PORT, (req, res) => {
+      res.writeHead(200, { 'apns-id': notificationId });
+      res.end('');
+    });
+    await new Promise(resolve => server.on('listening', resolve));
+
+    client = createClient(CLIENT_TEST_PORT);
+
+    const mockNotification = {
+      headers: { 'apns-someheader': 'somevalue' },
+      body: MOCK_BODY,
+    };
+    const device = MOCK_DEVICE_TOKEN;
+    const result = await client.write(mockNotification, device, 'device', 'post');
+
+    expect(result).to.deep.equal({ 'apns-id': notificationId, device });
+  });
+
   // https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/handling_notification_responses_from_apns
   it('JSON decodes HTTP 400 responses', async () => {
     let didRequest = false;
