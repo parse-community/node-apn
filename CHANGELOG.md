@@ -1,3 +1,10 @@
+# [7.1.0](https://github.com/parse-community/node-apn/compare/7.0.1...7.1.0) (2026-01-31)
+
+
+### Features
+
+* Add `apns-id` header to client return value ([#195](https://github.com/parse-community/node-apn/issues/195)) ([5567de1](https://github.com/parse-community/node-apn/commit/5567de1a6074c84d28e916c95e97410d8cec1734))
+
 ## [7.0.1](https://github.com/parse-community/node-apn/compare/7.0.0...7.0.1) (2025-12-04)
 
 
