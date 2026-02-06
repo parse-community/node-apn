@@ -120,6 +120,7 @@ interface Aps {
   badge?: number
   sound?: string | ApsSound
   "content-available"?: undefined | 1
+  "content-changed"?: undefined | true
   "mutable-content"?: undefined | 1
   "url-args"?: string[]
   category?: string
@@ -267,7 +268,7 @@ export class MultiProvider extends EventEmitter {
   shutdown(callback?: () => void): Promise<void>;
 }
 
-export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm';
+export type NotificationPushType = 'background' | 'alert' | 'voip' | 'pushtotalk' | 'liveactivity' | 'location' | 'complication' | 'fileprovider' | 'mdm' | 'widgets';
 
 export type ChannelAction = 'create' | 'read' | 'readAll' | 'delete';
 
