@@ -665,7 +665,7 @@ describe('Client', () => {
     ]);
   });
 
-  it('Handles goaway frames', async () => {
+  it('Handles goaway frames and retries the request on a new connection', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
@@ -714,7 +714,7 @@ describe('Client', () => {
     };
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
-    expect(establishedConnections).to.equal(2);
+    expect(establishedConnections).to.equal(8);
     expect(errorMessages).to.not.be.empty;
     let errorMessagesContainsGoAway = false;
     // Search for message, in older node, may be in random order.
@@ -2369,7 +2369,7 @@ describe('ManageChannelsClient', () => {
     expect(infoMessagesContainsTimeout).to.be.true;
   });
 
-  it('Handles goaway frames', async () => {
+  it('Handles goaway frames and retries the request on a new connection', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
@@ -2418,7 +2418,7 @@ describe('ManageChannelsClient', () => {
     };
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
-    expect(establishedConnections).to.equal(2);
+    expect(establishedConnections).to.equal(8);
     expect(errorMessages).to.not.be.empty;
     let errorMessagesContainsGoAway = false;
     // Search for message, in older node, may be in random order.
