@@ -1,3 +1,10 @@
+## [8.1.1](https://github.com/parse-community/node-apn/compare/8.1.0...8.1.1) (2026-10-28)
+
+
+### Bug Fixes
+
+* Bump node-forge from 1.4.0 to 1.4.2 ([#232](https://github.com/parse-community/node-apn/issues/232)) ([5ddfb10](https://github.com/parse-community/node-apn/commit/5ddfb1037a6c0f89f1176c18c970cb84aae36713))
+
 # [8.1.0](https://github.com/parse-community/node-apn/compare/8.0.0...8.1.0) (2026-04-12)
 
 
