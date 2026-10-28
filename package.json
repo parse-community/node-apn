@@ -20,7 +20,7 @@
   "dependencies": {
     "debug": "4.4.3",
     "jsonwebtoken": "9.0.3",
-    "node-forge": "1.4.0",
+    "node-forge": "1.4.2",
     "verror": "1.10.1"
   },
   "devDependencies": {
