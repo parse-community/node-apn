@@ -1,3 +1,10 @@
+# [8.2.0](https://github.com/parse-community/node-apn/compare/8.1.1...8.2.0) (2026-11-01)
+
+
+### Features
+
+* Add support for Node.js 26 ([#236](https://github.com/parse-community/node-apn/issues/236)) ([3a7bfa0](https://github.com/parse-community/node-apn/commit/3a7bfa06a89abac39e035062181488722efd113b))
+
 ## [8.1.1](https://github.com/parse-community/node-apn/compare/8.1.0...8.1.1) (2026-10-28)
 
 
