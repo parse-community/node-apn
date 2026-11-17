@@ -463,7 +463,7 @@ describe('MultiClient', () => {
     ]);
   });
 
-  it('Handles goaway frames', async () => {
+  it('Handles goaway frames and retries the request on a new connection', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
@@ -499,7 +499,7 @@ describe('MultiClient', () => {
     };
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
-    expect(establishedConnections).to.equal(2);
+    expect(establishedConnections).to.equal(8);
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
@@ -1564,7 +1564,7 @@ describe('ManageChannelsMultiClient', () => {
     ]);
   });
 
-  it('Handles goaway frames', async () => {
+  it('Handles goaway frames and retries the request on a new connection', async () => {
     let didGetRequest = false;
     let establishedConnections = 0;
     server = createAndStartMockLowLevelServer(TEST_PORT, stream => {
@@ -1600,7 +1600,7 @@ describe('ManageChannelsMultiClient', () => {
     };
     await performRequestExpectingGoAway();
     await performRequestExpectingGoAway();
-    expect(establishedConnections).to.equal(2);
+    expect(establishedConnections).to.equal(8);
   });
 
   it('Handles unexpected protocol errors (no response sent)', async () => {
